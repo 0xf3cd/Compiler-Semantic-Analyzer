@@ -1,6 +1,6 @@
 let ffi = require("ffi");
 
-let dll = ffi.Library('./LR', {
+let dll = ffi.Library('./Dylib/LR', {
     'setGrammar': ['void', ['string']],
     'setSource': ['void', ['string']],
     'reset': ['string', []],
@@ -10,8 +10,8 @@ let dll = ffi.Library('./LR', {
     'isSLR1': ['int', []],
 });
 
-dll.setGrammar('./Grammar.txt');
-dll.setSource('./example.cmm');
+dll.setGrammar('./TestFile/Grammar.txt');
+dll.setSource('./TestFile/example.cmm');
 console.log(dll.initialize());
 console.log(dll.isInitialized());
 console.log(dll.isLR0());

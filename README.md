@@ -3,12 +3,12 @@
 ## 说明
 
 - 项目延续 LR 分析方法的语法分析器
-
 - 由 C++ 完成了链接库 `LR.dll` 及 `LR.dylib`
-
-- 后续工作由 JavaScript 完成，使用 `Electron` 作为图形开发框架
-
-- 使用 `ffi,ref` 等 node 库来调用动态链接库
+- 后续工作由 JavaScript 完成，使用 `Electron` 作为跨平台的图形开发框架
+- 使用 `ffi, ref` 等 node 库来调用动态链接库
+- `./Dylib/` 中存放 Mac 和 Windows 下的动态链接库
+- `./TestFile` 中存放语法描述文件和待分析源代码
+- 现在 `main.js` 中是简单的测试代码
 
 
 
@@ -37,9 +37,9 @@
 
 
 
-## 准备工作 3 - 在 Node 中安装需要用到的库
+## 准备工作 3 - 安装开发过程中需要用到的库
 
-- 由于需要使用的库已经记录在 `./package.json` 中，故进入根目录后，可以直接执行 `npm install --python=X:\The\Path\To\Python2.exe`，其中 Python2 的路径即是 `准备工作 2` 中所安装的 `python.exe` 的路径
+- 由于需要使用的库已经记录在 `./package.json` 中，故进入根目录后，可以直接执行 `npm install --python=X:\The\Path\To\Python2`，其中 Python2 的路径即是 `准备工作 2` 中所安装的 `python.exe` 的路径
 - 等待安装完成即可
 - 之后如果增加了新的库，重新执行 `npm install --python=X:\...\python.exe` 即可
 
@@ -48,17 +48,18 @@
 ## 如何运行
 
 - 在命令行中输入 `node xxx.js` 即可以命令行的方式运行 js 代码
-
 - 输入 `npm run` 或 `electron .` 即可查看图形界面（暂时还未实现）
+- 现在运行 `node main.js` 可以检测工具是否都已经配置成功
+
+
 
 
 ## 组员需要补充的知识
 
 1. JS 语法（很简单，注意闭包，回调函数，匿名函数等等新概念即可）
-2. 了解 `Node.js` 中调用和自行编写库的方法 （使用 `require`,`module.exports` 等）
+2. 了解 `Node.js` 中调用和自行编写库的方法 （使用 `require`, `module.exports` 等）
 3. 学习网页开发
 4. 学会使用常用的动画效果、图形展示的 js 库
-
 
 
 
