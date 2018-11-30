@@ -8,6 +8,7 @@ let dll = ffi.Library('./Dylib/LR', {
     'isInitialized': ['int', []],
     'isLR0': ['int', []],
     'isSLR1': ['int', []],
+    'test_analyze': ['void', []],
 });
 
 dll.setGrammar('./TestFile/Grammar.txt');
@@ -16,3 +17,4 @@ console.log(dll.initialize());
 console.log(dll.isInitialized());
 console.log(dll.isLR0());
 console.log(dll.isSLR1());
+dll.test_analyze();
