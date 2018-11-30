@@ -1,20 +1,29 @@
-let ffi = require("ffi");
+const LR = require('./LR.js');
 
-let dll = ffi.Library('./Dylib/LR', {
-    'setGrammar': ['void', ['string']],
-    'setSource': ['void', ['string']],
-    'reset': ['string', []],
-    'initialize': ['int', []],
-    'isInitialized': ['int', []],
-    'isLR0': ['int', []],
-    'isSLR1': ['int', []],
-    'test_analyze': ['void', []],
-});
+LR.setGrammar('./TestFile/Grammar.txt');
+LR.setSource('./TestFile/example.cmm');
+LR.initialize();
 
-dll.setGrammar('./TestFile/Grammar.txt');
-dll.setSource('./TestFile/example.cmm');
-console.log(dll.initialize());
-console.log(dll.isInitialized());
-console.log(dll.isLR0());
-console.log(dll.isSLR1());
-dll.test_analyze();
+if(LR.isInitialized() !== 1) {
+    console.log('need to initialize');
+} else {
+    while(true) {
+        let temp = LR.getNext();
+        console.log(temp.au);
+        console.log(temp.token.value);
+        console.log(temp.symbol_name);
+        console.log(temp.production_left + ' -> ' + temp.production_right);
+        console.log(temp.error);
+        console.log(temp.symbol_stack);
+        console.log(temp.state_stack);
+        console.log();
+    
+        if(temp.error < 0) {
+            console.log('wrong!');
+            break;
+        } else if(temp.error == 3) {
+            console.log('success!');
+            break;
+        }
+    }
+}
