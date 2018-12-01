@@ -12,7 +12,13 @@ if(LR.isInitialized() !== 1) {
         console.log(temp.au);
         console.log(temp.token.value);
         console.log(temp.symbol_name);
-        console.log(temp.production_left + ' -> ' + temp.production_right);
+
+        if(temp.production_right[0] == 'ε') {
+            console.log(temp.production_left + ' -> epsilon');
+        } else {
+            console.log(temp.production_left + ' -> ' + temp.production_right);
+        }
+        
         console.log(temp.error);
         console.log(temp.symbol_stack);
         console.log(temp.state_stack);
