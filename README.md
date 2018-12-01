@@ -61,8 +61,10 @@
 
 ## 之后的工作
 
-1.  生成语法分析树
-2.  进行语义分析并生成中间代码
-3.  开发图形界面 with `HTML，CSS，JavaScript`
-4.  利用 `Electron` 打包成为桌面应用，`Electron` 可以理解成 `Node.js` 中的一个库（和 `ffi` 一样是库）
+1.   ~~将动态链接库包装成 js 可以直接使用的函数，并封装在 `LR.js `模块中~~
+2.   生成语法分析树
+3.   进行语义分析
+4.  生成中间代码
+5.   开发图形界面 with `HTML，CSS，JavaScript`
+6.   利用 `Electron` 打包成为桌面应用，`Electron` 可以理解成 `Node.js` 中的一个库（和 `ffi` 一样是库）
 
