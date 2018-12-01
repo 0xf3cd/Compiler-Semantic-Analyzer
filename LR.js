@@ -22,7 +22,7 @@ const js_snapshot = ref_struct({
     state_stack: 'string'
 });
 
-let dll = ffi.Library('./Dylib/LR', {
+let dll = ffi.Library('./dylib/LR', {
     'setGrammar': ['void', ['string']],
     'setSource': ['void', ['string']],
     'reset': ['string', []],
