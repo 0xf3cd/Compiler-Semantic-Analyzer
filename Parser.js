@@ -330,25 +330,6 @@ Parser.prototype.getNext = function() {
     return deepCopy(record);
 };
 
-
-
-/**
- * 这一步语法分析的结果，如 r1 s13 acc err 等
- * 若为空表示错误！
- * @public
- * @type {string}
- */
-this.parseResult = null;
-this.tokenValue = null;
-this.tokenType = null;
-this.productionLeft = null;
-/**
- * 这一步使用的产生式的右部，即一串变元和终结符，使用字符串数组记录
- * @public
- * @type {Array.<string>}
- */
-this.productionRight = new Array();
-
 /**
  * 调整语法分析树
  * @private
