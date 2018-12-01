@@ -31,8 +31,17 @@ int program(int a, int b, int c) {
 }
 
 int demo(int a) {
-	a = a + 2;
+	a = 2 * a;
+	while(a <= 1000) {
+		a = demo(a);
+	}
 	return a;
+}
+
+int omed(int x) {
+	int y;
+	y = y + 100;
+	return y * 100;
 }
 
 void main(void) {
@@ -43,6 +52,7 @@ void main(void) {
 	b = 4;
 	c = 2;
 	a = program(a, b, demo(c));
+	a = omed(a);
 	return;
 }
 #
