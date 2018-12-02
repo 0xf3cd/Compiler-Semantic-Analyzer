@@ -1,4 +1,14 @@
-int test(int a) {
-    return a;
+int f1(int a) {
+    int b;
+    b = a * a;
+    return b;
+}
+
+void f2(void) {
+    return 108;
+}
+
+void main(void) {
+    return f1(100) + f2();
 }
 #

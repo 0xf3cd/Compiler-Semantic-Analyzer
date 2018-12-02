@@ -154,6 +154,13 @@ class Node {
          * @type {Object}
          */
         this.parent = null;
+
+        /**
+         * 记录某个结点生发出下一级节点时使用的产生式的右部
+         * @public
+         * @type {Array.<string>}
+         */
+        this.productionRight = null;
     }
 };
 
@@ -204,13 +211,6 @@ class Parser {
          * @type {Array.<Object>}
          */
         this._topNodes = new Array();
-
-        // /**
-        //  * 记录语法分析树
-        //  * @private
-        //  * @type {Object}
-        //  */
-        // this._parseTree = null;
     }
 };
 
@@ -347,6 +347,7 @@ Parser.prototype._modifyParseTree = function(rcd) {
         // 需要进行规约
         let newNode = new Node();
         newNode.name = rcd.productionLeft; // 创建变元结点
+        newNode.productionRight = rcd.productionRight;
 
         let sonAmounts = rcd.productionRight.length;
 
