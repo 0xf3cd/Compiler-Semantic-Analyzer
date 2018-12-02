@@ -1,0 +1,138 @@
+27
+S' 1
+<Decl> 2
+<DeclType> 3
+<FuncDecl> 4
+<VarDecl> 5
+<FormalParams> 6
+<StmtBlock> 7
+<ParamList> 8
+<Param> 9
+<InnerDecl> 10
+<Stmts> 11
+<InnerVarDecl> 12
+<Stmt> 13
+<IfStmt> 14
+<WhileStmt> 15
+<ReturnStmt> 16
+<AssignStmt> 17
+<Exprsn> 18
+<AddExprsn> 19
+S 20
+<RelaOp> 21
+<Item> 22
+<Factor> 23
+<FactorType> 24
+<FuncCall> 25
+<ActualArgs> 26
+<ArgList> 27
+
+26
+int 1
+void 2
+if 3
+else 4
+while 5
+return 6
+ID 7
+num 8
+= 9
++ 10
+- 11
+* 12
+/ 13
+== 14
+!= 15
+< 16
+<= 17
+> 18
+>= 19
+; 20
+, 21
+( 22
+) 23
+{ 24
+} 25
+ε 29
+
+54
+S' -> S $
+
+S -> <Decl> $
+S -> <Decl> S $
+
+<Decl> -> int ID <DeclType> $
+<Decl> -> void ID <FuncDecl> $
+
+<DeclType> -> <VarDecl> $
+<DeclType> -> <FuncDecl> $
+
+<VarDecl> -> ; $
+
+<FuncDecl> -> ( <FormalParams> ) <StmtBlock> $
+
+<FormalParams> -> <ParamList> $
+<FormalParams> -> void $
+
+<ParamList> -> <Param> $
+<ParamList> -> <Param> , <ParamList> $
+
+<Param> -> int ID $
+
+<StmtBlock> -> { <InnerDecl> <Stmts> } $ 
+
+<InnerDecl> -> <InnerVarDecl> ; <InnerDecl> $
+<InnerDecl> -> ε $
+
+<InnerVarDecl> -> int ID $
+
+<Stmts> -> <Stmt> $
+<Stmts> -> <Stmt> <Stmts> $
+
+<Stmt> -> <IfStmt> $
+<Stmt> -> <WhileStmt> $
+<Stmt> -> <ReturnStmt> $
+<Stmt> -> <AssignStmt> $
+
+<AssignStmt> -> ID = <Exprsn> ; $
+
+<ReturnStmt> -> return ; $
+<ReturnStmt> -> return <Exprsn> ; $
+
+<WhileStmt> -> while ( <Exprsn> ) <StmtBlock> $
+
+<IfStmt> -> if ( <Exprsn> ) <StmtBlock> $
+<IfStmt> -> if ( <Exprsn> ) <StmtBlock> else <StmtBlock> $
+
+<Exprsn> -> <AddExprsn> $
+<Exprsn> -> <AddExprsn> <RelaOp> <Exprsn> $
+
+<RelaOp> -> < $
+<RelaOp> -> <= $
+<RelaOp> -> > $
+<RelaOp> -> >= $
+<RelaOp> -> == $
+<RelaOp> -> != $
+
+<AddExprsn> -> <Item> $
+<AddExprsn> -> <Item> + <AddExprsn> $
+<AddExprsn> -> <Item> - <AddExprsn> $
+
+<Item> -> <Factor> $
+<Item> -> <Factor> * <Item> $
+<Item> -> <Factor> / <Item> $
+
+<Factor> -> num $
+<Factor> -> ( <Exprsn> ) $
+<Factor> -> ID <FactorType> $
+
+<FactorType> -> <FuncCall> $
+<FactorType> -> ε $
+
+<FuncCall> -> ( <ActualArgs> ) $
+
+<ActualArgs> -> <ArgList> $
+<ActualArgs> -> ε $
+
+<ArgList> -> <Exprsn> $
+<ArgList> -> <Exprsn> , <ArgList> $

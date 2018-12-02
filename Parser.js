@@ -178,7 +178,7 @@ class Parser {
          * @private
          * @type {string}
          */
-        this._grammarDir = './TestFile/Grammar-Simple.txt';
+        this._grammarDir = './TestFile/Grammar-Detailed.txt';
 
         /**
          * 待分析源代码文件的位置，赋了初值
@@ -251,7 +251,7 @@ Parser.prototype.initialize = function() {
  * @public
  */
 Parser.prototype.reset = function() {
-    this._grammarDir = './TestFile/Grammar-Simple.txt';
+    this._grammarDir = './TestFile/Grammar-Detailed.txt';
     this._sourceDir = './TestFile/example.cmm';
     this._parserState = -1;
     this._records = new Array();
