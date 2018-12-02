@@ -178,7 +178,7 @@ class Parser {
          * @private
          * @type {string}
          */
-        this._grammarDir = './TestFile/Grammar-Detailed.txt';
+        this._grammarDir = './TestFile/Grammar.txt';
 
         /**
          * 待分析源代码文件的位置，赋了初值
@@ -251,7 +251,7 @@ Parser.prototype.initialize = function() {
  * @public
  */
 Parser.prototype.reset = function() {
-    this._grammarDir = './TestFile/Grammar-Detailed.txt';
+    this._grammarDir = './TestFile/Grammar.txt';
     this._sourceDir = './TestFile/example.cmm';
     this._parserState = -1;
     this._records = new Array();
@@ -295,6 +295,32 @@ Parser.prototype.getRecords = function() {
 Parser.prototype.getParseTree = function() {
     // return deepCopy(this._parseTree);
     return deepCopy(this._topNodes[0]);
+};
+
+/**
+ * 返回文法是否为 LR0 文法
+ * @public
+ * @return {boolean}
+ */
+Parser.prototype.isLR0 = function() {
+    if(this._parserState === -1 || LR.isLR0() <= 0) {
+        return false;
+    } else {
+        return true;
+    }
+};
+
+/**
+ * 返回文法是否为 SLR1 文法
+ * @public
+ * @return {boolean}
+ */
+Parser.prototype.isSLR1 = function() {
+    if(this._parserState === -1 || LR.isSLR1() <= 0) {
+        return false;
+    } else {
+        return true;
+    }
 };
 
 /**

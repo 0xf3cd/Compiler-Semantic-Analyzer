@@ -17,3 +17,6 @@ while(true) {
 
 let t = P.getParseTree();
 console.log(t); //S
+
+console.log();
+console.log(P.isSLR1());
