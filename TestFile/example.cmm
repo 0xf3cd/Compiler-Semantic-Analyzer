@@ -1,16 +1,22 @@
 int x = 3;
+int y = x * x;
+int z = (x > y);
+int w = x > y * (7 + b / (z != x)) - (x * x <= z);
 
 int f1(int a) {
-    int b;
-    b = a * a;
+    int b = a * a;
     return b;
 }
 
-void f2(void) {
-    return 108;
+void f2() {
+    return 108 * f1(18);
 }
 
-void main() {
-    return f1(100) + f2();
+int main(void) {
+    if(((f1(100) + f2(void) > 10)) != 100) {
+        return x;
+    } else {
+        return w;
+    }
 }
 #

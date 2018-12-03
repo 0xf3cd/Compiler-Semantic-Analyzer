@@ -71,35 +71,40 @@
 
 ## 变元表
 
-* 以 `Grammar.txt` 为例
+- 以 `Grammar.txt` 为例
+- 由于需要文法需要为 `SLR1` 的，所以形式不足够美观(pretty elegant though)
+- 基于老师所给定文法的调整（列出部分）
+    * 只有整型的数据
+    * 函数声明和调用时，如果不需要参数，可以在括号内写 `void` 或者不写 
+    * 关系运算符、加减乘除等都视作二元运算符，可以同时出现在一个式子内，如 `1 >= 2 + 4 * 5`
+        * 关系运算符优先级最低，运算结果为整型的 `1 or 0`
+        * 加减运算符比关系运算符高，乘除又比加减高
+        * 括号最高
 
-|      |     English      |     Chinese      |                Remark                |
-| :--: | :--------------: | :--------------: | :----------------------------------: |
-|  1   |        S'        | 拓广文法起始变元 |                                      |
-|  2   |        S         |     起始变元     |                                      |
-|  3   |     \<Body\>     |       主体       |                                      |
-|  4   |     \<Decl\>     |       声明       |         Decl for Declaration         |
-|  5   |   \<DeclType\>   |     声明类型     |                                      |
-|  6   |   \<FuncDecl\>   |     函数声明     |                                      |
-|  7   |   \<VarDecl\>    |     变量声明     |                                      |
-|  8   | \<FormalParams\> |       形参       |         Param for parameter          |
-|  9   |  \<StmtBlock\>   |      语句块      |          Stmt for Statement          |
-|  10  |  \<ParamList\>   |      形参表      |                                      |
-|  11  |    \<Param\>     |       参数       |                                      |
-|  12  |  \<InnerDecl\>   |     内部声明     |                                      |
-|  13  |    \<Stmts\>     |      语句串      |                                      |
-|  14  | \<InnerVarDecl\> |   内部变量声明   |                                      |
-|  15  |     \<Stmt\>     |       语句       |                                      |
-|  16  |    \<IfStmt\>    |      if语句      |                                      |
-|  17  |  \<WhileStmt\>   |    while语句     |                                      |
-|  18  |  \<ReturnStmt\>  |    return语句    |                                      |
-|  19  |  \<AssignStmt\>  |     赋值语句     |                                      |
-|  20  |  \<CompExprsn\>  |  比较运算表达式  | Comp for Compare，如 ">= 3"、"!= 15" |
-|  21  |  \<AddExprsn\>   |    加法表法式    |                                      |
-|  22  |    \<RelOp\>     |    关系运算符    |            == != <= > 等             |
-|  23  |     \<Item\>     |        项        |                                      |
-|  24  |    \<Factor\>    |       因子       |     因子与因子间可能有乘法或除法     |
-|  25  |   \<FuncCall\>   |     函数调用     |                                      |
-|  26  |  \<ActualArgs\>  |       实参       |                                      |
-|  27  |   \<ArgList\>    |     实参列表     |                                      |
-
+|      |      English       |      Chinese       |                 Remark                  |
+| :--: | :----------------: | :----------------: | :-------------------------------------: |
+|  1   |         S'         |  拓广文法起始变元  |                                         |
+|  2   |         S          |      起始变元      |                                         |
+|  3   |      \<Body\>      |        主体        |                                         |
+|  4   |      \<Decl\>      |        声明        |         Decl for Declaration          |
+|  5   |    \<FuncDecl\>    |      函数声明      |                                         |
+|  6   |    \<VarDecl\>     |      变量声明      |                                         |
+|  7   |  \<FormalParams\>  |        形参        |          Param for Parameter          |
+|  8   |   \<StmtBlock\>    |       语句块       |          Stmt for Statement           |
+|  9   |   \<ParamList\>    |       形参表       |                                         |
+|  10  |     \<Param\>      |        参数        |                                         |
+|  11  |   \<InnerDecl\>    |      内部声明      |                                         |
+|  12  |     \<Stmts\>      |       语句串       |                                         |
+|  13  |  \<InnerVarDecl\>  |    内部变量声明    |                                         |
+|  14  |      \<Stmt\>      |        语句        |                                         |
+|  15  |     \<IfStmt\>     |       if语句       |                                         |
+|  16  |   \<WhileStmt\>    |     while语句      |                                         |
+|  17  |   \<ReturnStmt\>   |     return语句     |                                         |
+|  18  |   \<AssignStmt\>   |      赋值语句      |                                         |
+|  19  |     \<Exprsn\>     |       表达式       |                                         |
+|  20  |   \<AddExprsn\>    |     加法表法式     |                                         |
+|  21  |      \<Item\>      |         项         |                                         |
+|  22  |     \<Factor\>     |        因子        |      因子与因子间可能有乘法或除法       |
+|  23  |    \<FuncCall\>    |      函数调用      |                                         |
+|  24  |   \<ActualArgs\>   |        实参        |                                         |
+|  25  |    \<ArgList\>     |      实参列表      |                                         |

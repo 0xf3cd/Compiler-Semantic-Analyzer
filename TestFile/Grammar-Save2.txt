@@ -1,4 +1,4 @@
-25
+26
 S' 1
 S 2
 <Body> 3
@@ -17,13 +17,14 @@ S 2
 <WhileStmt> 16
 <ReturnStmt> 17
 <AssignStmt> 18
-<Exprsn> 19
+<CompExprsn> 19
 <AddExprsn> 20
-<Item> 21
-<Factor> 22
-<FuncCall> 23
-<ActualArgs> 24
-<ArgList> 25
+<RelOp> 21
+<Item> 22
+<Factor> 23
+<FuncCall> 24
+<ActualArgs> 25
+<ArgList> 26
 
 26
 int 1
@@ -53,7 +54,7 @@ num 8
 } 25
 ε 29
 
-56
+57
 S' -> S $
 
 S -> <Body> $
@@ -66,7 +67,7 @@ S -> <Body> S $
 <Decl> -> void ID <FuncDecl> $
 
 <VarDecl> -> ; $
-<VarDecl> -> = <Exprsn> ; $
+<VarDecl> -> = <AddExprsn> ; $
 
 <FuncDecl> -> ( <FormalParams> ) <StmtBlock> $
 
@@ -85,7 +86,7 @@ S -> <Body> S $
 <InnerDecl> -> ε $
 
 <InnerVarDecl> -> int ID $
-<InnerVarDecl> -> int ID = <Exprsn> $
+<InnerVarDecl> -> int ID = <AddExprsn> $
 
 <Stmts> -> <Stmt> <Stmts> $
 <Stmts> -> <Stmt> $
@@ -95,23 +96,25 @@ S -> <Body> S $
 <Stmt> -> <ReturnStmt> $
 <Stmt> -> <AssignStmt> $
 
-<AssignStmt> -> ID = <Exprsn> ; $
+<AssignStmt> -> ID = <AddExprsn> ; $
 
-<ReturnStmt> -> return <Exprsn> ; $
+<ReturnStmt> -> return <AddExprsn> ; $
 <ReturnStmt> -> return ; $
 
-<WhileStmt> -> while ( <Exprsn> ) <StmtBlock> $
+<WhileStmt> -> while ( <AddExprsn> <CompExprsn> ) <StmtBlock> $
 
-<IfStmt> -> if ( <Exprsn> ) <StmtBlock> else <StmtBlock> $
-<IfStmt> -> if ( <Exprsn> ) <StmtBlock> $
+<IfStmt> -> if ( <AddExprsn> <CompExprsn> ) <StmtBlock> else <StmtBlock> $
+<IfStmt> -> if ( <AddExprsn> <CompExprsn> ) <StmtBlock> $
 
-<Exprsn> -> <AddExprsn> $
-<Exprsn> -> <AddExprsn> < <Exprsn> $
-<Exprsn> -> <AddExprsn> <= <Exprsn> $
-<Exprsn> -> <AddExprsn> > <Exprsn> $
-<Exprsn> -> <AddExprsn> >= <Exprsn> $
-<Exprsn> -> <AddExprsn> == <Exprsn> $
-<Exprsn> -> <AddExprsn> != <Exprsn> $
+<CompExprsn> -> ε $
+<CompExprsn> -> <RelOp> <AddExprsn> $
+
+<RelOp> -> < $
+<RelOp> -> <= $
+<RelOp> -> > $
+<RelOp> -> >= $
+<RelOp> -> == $
+<RelOp> -> != $
 
 <AddExprsn> -> <Item> + <AddExprsn> $
 <AddExprsn> -> <Item> - <AddExprsn> $
@@ -122,7 +125,7 @@ S -> <Body> S $
 <Item> -> <Factor> $
 
 <Factor> -> num $
-<Factor> -> ( <Exprsn> ) $
+<Factor> -> ( <AddExprsn> ) $
 <Factor> -> ID $
 <Factor> -> ID <FuncCall> $
 

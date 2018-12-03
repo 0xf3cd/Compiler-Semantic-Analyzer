@@ -1,29 +1,31 @@
-25
+27
 S' 1
 S 2
 <Body> 3
 <Decl> 4
-<FuncDecl> 5
-<VarDecl> 6
-<FormalParams> 7
-<StmtBlock> 8
-<ParamList> 9
-<Param> 10
-<InnerDecl> 11
-<Stmts> 12
-<InnerVarDecl> 13
-<Stmt> 14
-<IfStmt> 15
-<WhileStmt> 16
-<ReturnStmt> 17
-<AssignStmt> 18
-<Exprsn> 19
-<AddExprsn> 20
-<Item> 21
-<Factor> 22
-<FuncCall> 23
-<ActualArgs> 24
-<ArgList> 25
+<DeclType> 5
+<FuncDecl> 6
+<VarDecl> 7
+<FormalParams> 8
+<StmtBlock> 9
+<ParamList> 10
+<Param> 11
+<InnerDecl> 12
+<Stmts> 13
+<InnerVarDecl> 14
+<Stmt> 15
+<IfStmt> 16
+<WhileStmt> 17
+<ReturnStmt> 18
+<AssignStmt> 19
+<CompExprsn> 20
+<AddExprsn> 21
+<RelOp> 22
+<Item> 23
+<Factor> 24
+<FuncCall> 25
+<ActualArgs> 26
+<ArgList> 27
 
 26
 int 1
@@ -61,12 +63,14 @@ S -> <Body> S $
 
 <Body> -> <Decl> $
 
-<Decl> -> int ID <VarDecl> $
-<Decl> -> int ID <FuncDecl> $
+<Decl> -> int ID <DeclType> $
 <Decl> -> void ID <FuncDecl> $
 
+<DeclType> -> <VarDecl> $
+<DeclType> -> <FuncDecl> $
+
 <VarDecl> -> ; $
-<VarDecl> -> = <Exprsn> ; $
+<VarDecl> -> = num ; $
 
 <FuncDecl> -> ( <FormalParams> ) <StmtBlock> $
 
@@ -85,7 +89,6 @@ S -> <Body> S $
 <InnerDecl> -> ε $
 
 <InnerVarDecl> -> int ID $
-<InnerVarDecl> -> int ID = <Exprsn> $
 
 <Stmts> -> <Stmt> <Stmts> $
 <Stmts> -> <Stmt> $
@@ -95,23 +98,25 @@ S -> <Body> S $
 <Stmt> -> <ReturnStmt> $
 <Stmt> -> <AssignStmt> $
 
-<AssignStmt> -> ID = <Exprsn> ; $
+<AssignStmt> -> ID = <AddExprsn> <CompExprsn> ; $
 
-<ReturnStmt> -> return <Exprsn> ; $
+<ReturnStmt> -> return <AddExprsn> <CompExprsn> ; $
 <ReturnStmt> -> return ; $
 
-<WhileStmt> -> while ( <Exprsn> ) <StmtBlock> $
+<WhileStmt> -> while ( <AddExprsn> <CompExprsn> ) <StmtBlock> $
 
-<IfStmt> -> if ( <Exprsn> ) <StmtBlock> else <StmtBlock> $
-<IfStmt> -> if ( <Exprsn> ) <StmtBlock> $
+<IfStmt> -> if ( <AddExprsn> <CompExprsn> ) <StmtBlock> else <StmtBlock> $
+<IfStmt> -> if ( <AddExprsn> <CompExprsn> ) <StmtBlock> $
 
-<Exprsn> -> <AddExprsn> $
-<Exprsn> -> <AddExprsn> < <Exprsn> $
-<Exprsn> -> <AddExprsn> <= <Exprsn> $
-<Exprsn> -> <AddExprsn> > <Exprsn> $
-<Exprsn> -> <AddExprsn> >= <Exprsn> $
-<Exprsn> -> <AddExprsn> == <Exprsn> $
-<Exprsn> -> <AddExprsn> != <Exprsn> $
+<CompExprsn> -> ε $
+<CompExprsn> -> <RelOp> <AddExprsn> <CompExprsn> $
+
+<RelOp> -> < $
+<RelOp> -> <= $
+<RelOp> -> > $
+<RelOp> -> >= $
+<RelOp> -> == $
+<RelOp> -> != $
 
 <AddExprsn> -> <Item> + <AddExprsn> $
 <AddExprsn> -> <Item> - <AddExprsn> $
@@ -122,15 +127,14 @@ S -> <Body> S $
 <Item> -> <Factor> $
 
 <Factor> -> num $
-<Factor> -> ( <Exprsn> ) $
+<Factor> -> ( <AddExprsn> <CompExprsn> ) $
 <Factor> -> ID $
 <Factor> -> ID <FuncCall> $
 
 <FuncCall> -> ( <ActualArgs> ) $
 
 <ActualArgs> -> <ArgList> $
-<ActualArgs> -> void $
 <ActualArgs> -> ε $
 
-<ArgList> -> <AddExprsn> , <ArgList> $
-<ArgList> -> <AddExprsn> $
+<ArgList> -> <AddExprsn> <CompExprsn> , <ArgList> $
+<ArgList> -> <AddExprsn> <CompExprsn> $
