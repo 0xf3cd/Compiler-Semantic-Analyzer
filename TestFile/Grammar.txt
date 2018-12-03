@@ -1,31 +1,31 @@
 27
 S' 1
 S 2
-A 3
-B 4
-C 5
-D 6
-E 7
-F 8
-G 9
-H 10
-I 11
-J 12
-K 13
-L 14
-M 15
-N 16
-O 17
-P 18
-Q 19
-R 20
-T 21
-U 22
-V 23
-W 24
-X 25
-Y 26
-Z 27
+<Body> 3
+<Decl> 4
+<DeclType> 5
+<FuncDecl> 6
+<VarDecl> 7
+<FormalParams> 8
+<StmtBlock> 9
+<ParamList> 10
+<Param> 11
+<InnerDecl> 12
+<Stmts> 13
+<InnerVarDecl> 14
+<Stmt> 15
+<IfStmt> 16
+<WhileStmt> 17
+<ReturnStmt> 18
+<AssignStmt> 19
+<CompExprsn> 20
+<AddExprsn> 21
+<RelOp> 22
+<Item> 23
+<Factor> 24
+<FuncCall> 25
+<ActualArgs> 26
+<ArgList> 27
 
 26
 int 1
@@ -55,84 +55,86 @@ num 8
 } 25
 ε 29
 
-54
+56
 S' -> S $
 
-S -> A S $
-S -> A $
+S -> <Body> $
+S -> <Body> S $
 
-A -> int ID B $
-A -> void ID C $
+<Body> -> <Decl> $
 
-B -> D $
-B -> C $
+<Decl> -> int ID <DeclType> $
+<Decl> -> void ID <FuncDecl> $
 
-D -> ; $
+<DeclType> -> <VarDecl> $
+<DeclType> -> <FuncDecl> $
 
-C -> ( E ) F $
+<VarDecl> -> ; $
+<VarDecl> -> = num ; $
 
-E -> G $
-E -> void $
+<FuncDecl> -> ( <FormalParams> ) <StmtBlock> $
 
-G -> H $
-G -> H , G $
+<FormalParams> -> <ParamList> $
+<FormalParams> -> void $
+<FormalParams> -> ε $
 
-H -> int ID $
+<ParamList> -> <Param> $
+<ParamList> -> <Param> , <ParamList> $
 
-F -> { I J } $
+<Param> -> int ID $
 
-I -> K ; I $
-I -> ε $
+<StmtBlock> -> { <InnerDecl> <Stmts> } $
 
-K -> int ID $
+<InnerDecl> -> <InnerVarDecl> ; <InnerDecl> $
+<InnerDecl> -> ε $
 
-J -> L J $
-J -> L $
+<InnerVarDecl> -> int ID $
 
-L -> M $
-L -> N $
-L -> O $
-L -> P $
+<Stmts> -> <Stmt> <Stmts> $
+<Stmts> -> <Stmt> $
 
-P -> ID = R Q ; $
+<Stmt> -> <IfStmt> $
+<Stmt> -> <WhileStmt> $
+<Stmt> -> <ReturnStmt> $
+<Stmt> -> <AssignStmt> $
 
-O -> return R Q ; $
-O -> return ; $
+<AssignStmt> -> ID = <AddExprsn> <CompExprsn> ; $
 
-N -> while ( R Q ) F $
+<ReturnStmt> -> return <AddExprsn> <CompExprsn> ; $
+<ReturnStmt> -> return ; $
 
-M -> if ( R Q ) F else F $
-M -> if ( R Q ) F $
+<WhileStmt> -> while ( <AddExprsn> <CompExprsn> ) <StmtBlock> $
 
-Q -> ε $
-Q -> T R Q $
+<IfStmt> -> if ( <AddExprsn> <CompExprsn> ) <StmtBlock> else <StmtBlock> $
+<IfStmt> -> if ( <AddExprsn> <CompExprsn> ) <StmtBlock> $
 
-T -> < $
-T -> <= $
-T -> > $
-T -> >= $
-T -> == $
-T -> != $
+<CompExprsn> -> ε $
+<CompExprsn> -> <RelOp> <AddExprsn> <CompExprsn> $
 
-R -> U + R $
-R -> U - R $
-R -> U $
+<RelOp> -> < $
+<RelOp> -> <= $
+<RelOp> -> > $
+<RelOp> -> >= $
+<RelOp> -> == $
+<RelOp> -> != $
 
-U -> V * U $
-U -> V / U $
-U -> V $
+<AddExprsn> -> <Item> + <AddExprsn> $
+<AddExprsn> -> <Item> - <AddExprsn> $
+<AddExprsn> -> <Item> $
 
-V -> num $
-V -> ( R Q ) $
-V -> ID W $
+<Item> -> <Factor> * <Item> $
+<Item> -> <Factor> / <Item> $
+<Item> -> <Factor> $
 
-W -> X $
-W -> ε $
+<Factor> -> num $
+<Factor> -> ( <AddExprsn> <CompExprsn> ) $
+<Factor> -> ID $
+<Factor> -> ID <FuncCall> $
 
-X -> ( Y ) $
+<FuncCall> -> ( <ActualArgs> ) $
 
-Y -> Z $
-Y -> ε $
+<ActualArgs> -> <ArgList> $
+<ActualArgs> -> ε $
 
-Z -> R Q , Z $
-Z -> R Q $
+<ArgList> -> <AddExprsn> <CompExprsn> , <ArgList> $
+<ArgList> -> <AddExprsn> <CompExprsn> $

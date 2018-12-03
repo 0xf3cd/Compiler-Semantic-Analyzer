@@ -1,7 +1,7 @@
 const Parser = require('./Parser.js');
 
 let P = new Parser();
-P.setGrammar('./TestFile/Grammar-Detailed.txt');
+P.setGrammar('./TestFile/Grammar.txt');
 P.initialize();
 while(true) {
     let record = P.getNext();

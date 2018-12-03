@@ -68,3 +68,38 @@
 5.  开发图形界面 with `HTML，CSS，JavaScript`
 6.  利用 `Electron` 打包成为桌面应用，`Electron` 可以理解成 `Node.js` 中的一个库（和 `ffi` 一样是库）
 
+
+## 变元表
+
+* 以 `Grammar.txt` 为例
+
+|      |     English      |     Chinese      |                Remark                |
+| :--: | :--------------: | :--------------: | :----------------------------------: |
+|  1   |        S'        | 拓广文法起始变元 |                                      |
+|  2   |        S         |     起始变元     |                                      |
+|  3   |     \<Body\>     |       主体       |                                      |
+|  4   |     \<Decl\>     |       声明       |         Decl for Declaration         |
+|  5   |   \<DeclType\>   |     声明类型     |                                      |
+|  6   |   \<FuncDecl\>   |     函数声明     |                                      |
+|  7   |   \<VarDecl\>    |     变量声明     |                                      |
+|  8   | \<FormalParams\> |       形参       |         Param for parameter          |
+|  9   |  \<StmtBlock\>   |      语句块      |          Stmt for Statement          |
+|  10  |  \<ParamList\>   |      形参表      |                                      |
+|  11  |    \<Param\>     |       参数       |                                      |
+|  12  |  \<InnerDecl\>   |     内部声明     |                                      |
+|  13  |    \<Stmts\>     |      语句串      |                                      |
+|  14  | \<InnerVarDecl\> |   内部变量声明   |                                      |
+|  15  |     \<Stmt\>     |       语句       |                                      |
+|  16  |    \<IfStmt\>    |      if语句      |                                      |
+|  17  |  \<WhileStmt\>   |    while语句     |                                      |
+|  18  |  \<ReturnStmt\>  |    return语句    |                                      |
+|  19  |  \<AssignStmt\>  |     赋值语句     |                                      |
+|  20  |  \<CompExprsn\>  |  比较运算表达式  | Comp for Compare，如 ">= 3"、"!= 15" |
+|  21  |  \<AddExprsn\>   |    加法表法式    |                                      |
+|  22  |    \<RelOp\>     |    关系运算符    |            == != <= > 等             |
+|  23  |     \<Item\>     |        项        |                                      |
+|  24  |    \<Factor\>    |       因子       |     因子与因子间可能有乘法或除法     |
+|  25  |   \<FuncCall\>   |     函数调用     |                                      |
+|  26  |  \<ActualArgs\>  |       实参       |                                      |
+|  27  |   \<ArgList\>    |     实参列表     |                                      |
+

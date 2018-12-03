@@ -1,3 +1,5 @@
+int x = 3;
+
 int f1(int a) {
     int b;
     b = a * a;
@@ -8,7 +10,7 @@ void f2(void) {
     return 108;
 }
 
-void main(void) {
+void main() {
     return f1(100) + f2();
 }
 #
