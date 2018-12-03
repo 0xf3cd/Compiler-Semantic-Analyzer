@@ -1,40 +1,31 @@
-36
-A 1
-B 2
-C 3
-D 4
-E 5
-F 6
-G 7
-G' 8
-H 9
-I 10
-J 11
-J' 12
+27
+S' 1
+S 2
+A 3
+B 4
+C 5
+D 6
+E 7
+F 8
+G 9
+H 10
+I 11
+J 12
 K 13
 L 14
 M 15
-M' 16
-N 17
-O 18
-O' 19
-P 20
-Q 21
-Q' 22
-R 23
-R' 24
-S 25
-S' 26
-T 27
-U 28
-U' 29
-V 30
-W 31
-X 32
-Y 33
-Z 34
-Z' 35
-S'' 36
+N 16
+O 17
+P 18
+Q 19
+R 20
+T 21
+U 22
+V 23
+W 24
+X 25
+Y 26
+Z 27
 
 26
 int 1
@@ -64,12 +55,11 @@ num 8
 } 25
 ε 29
 
-63
+54
 S' -> S $
 
-S -> A S'' $
-S'' -> S $
-S'' -> ε $
+S -> A S $
+S -> A $
 
 A -> int ID B $
 A -> void ID C $
@@ -84,9 +74,8 @@ C -> ( E ) F $
 E -> G $
 E -> void $
 
-G -> H G' $
-G' -> , G $
-G' -> ε $
+G -> H $
+G -> H , G $
 
 H -> int ID $
 
@@ -97,30 +86,26 @@ I -> ε $
 
 K -> int ID $
 
-J -> L J' $
-J' -> J $
-J' -> ε $
+J -> L J $
+J -> L $
 
 L -> M $
 L -> N $
 L -> O $
 L -> P $
 
-P -> ID = Q ; $
+P -> ID = R Q ; $
 
-O -> return O' ; $
-O' -> Q $
-O' -> ε $
+O -> return R Q ; $
+O -> return ; $
 
-N -> while ( Q ) F $
+N -> while ( R Q ) F $
 
-M -> if ( Q ) F M' $
-M' -> else F $
-M' -> ε $
+M -> if ( R Q ) F else F $
+M -> if ( R Q ) F $
 
-Q -> R Q' $
-Q' -> T Q $
-Q' -> ε $
+Q -> ε $
+Q -> T R Q $
 
 T -> < $
 T -> <= $
@@ -129,18 +114,16 @@ T -> >= $
 T -> == $
 T -> != $
 
-R -> U R' $
-R' -> + R $
-R' -> - R $
-R' -> ε $
+R -> U + R $
+R -> U - R $
+R -> U $
 
-U -> V U' $
-U' -> * U $
-U' -> / U $
-U' -> ε $
+U -> V * U $
+U -> V / U $
+U -> V $
 
 V -> num $
-V -> ( Q ) $
+V -> ( R Q ) $
 V -> ID W $
 
 W -> X $
@@ -151,6 +134,5 @@ X -> ( Y ) $
 Y -> Z $
 Y -> ε $
 
-Z -> Q Z' $
-Z' -> , Z $
-Z' -> ε $
+Z -> R Q , Z $
+Z -> R Q $

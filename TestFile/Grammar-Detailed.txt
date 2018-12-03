@@ -1,28 +1,28 @@
 27
 S' 1
-<Decl> 2
-<DeclType> 3
-<FuncDecl> 4
-<VarDecl> 5
-<FormalParams> 6
-<StmtBlock> 7
-<ParamList> 8
-<Param> 9
-<InnerDecl> 10
-<Stmts> 11
-<InnerVarDecl> 12
-<Stmt> 13
-<IfStmt> 14
-<WhileStmt> 15
-<ReturnStmt> 16
-<AssignStmt> 17
-<Exprsn> 18
-<AddExprsn> 19
-S 20
-<RelaOp> 21
-<Item> 22
-<Factor> 23
-<FactorType> 24
+S 2
+<Body> 3
+<Decl> 4
+<DeclType> 5
+<FuncDecl> 6
+<VarDecl> 7
+<FormalParams> 8
+<StmtBlock> 9
+<ParamList> 10
+<Param> 11
+<InnerDecl> 12
+<Stmts> 13
+<InnerVarDecl> 14
+<Stmt> 15
+<IfStmt> 16
+<WhileStmt> 17
+<ReturnStmt> 18
+<AssignStmt> 19
+<CompExprsn> 20
+<AddExprsn> 21
+<RelOp> 22
+<Item> 23
+<Factor> 24
 <FuncCall> 25
 <ActualArgs> 26
 <ArgList> 27
@@ -57,9 +57,10 @@ num 8
 
 54
 S' -> S $
+S -> <Body> $
 
-S -> <Decl> $
-S -> <Decl> S $
+<Body> -> <Decl> <Body> $
+<Body> -> <Decl> $
 
 <Decl> -> int ID <DeclType> $
 <Decl> -> void ID <FuncDecl> $
@@ -79,60 +80,58 @@ S -> <Decl> S $
 
 <Param> -> int ID $
 
-<StmtBlock> -> { <InnerDecl> <Stmts> } $ 
+<StmtBlock> -> { <InnerDecl> <Stmts> } $
 
 <InnerDecl> -> <InnerVarDecl> ; <InnerDecl> $
 <InnerDecl> -> ε $
 
 <InnerVarDecl> -> int ID $
 
-<Stmts> -> <Stmt> $
 <Stmts> -> <Stmt> <Stmts> $
+<Stmts> -> <Stmt> $
 
 <Stmt> -> <IfStmt> $
 <Stmt> -> <WhileStmt> $
 <Stmt> -> <ReturnStmt> $
 <Stmt> -> <AssignStmt> $
 
-<AssignStmt> -> ID = <Exprsn> ; $
+<AssignStmt> -> ID = <AddExprsn> <CompExprsn> ; $
 
+<ReturnStmt> -> return <AddExprsn> <CompExprsn> ; $
 <ReturnStmt> -> return ; $
-<ReturnStmt> -> return <Exprsn> ; $
 
-<WhileStmt> -> while ( <Exprsn> ) <StmtBlock> $
+<WhileStmt> -> while ( <AddExprsn> <CompExprsn> ) <StmtBlock> $
 
-<IfStmt> -> if ( <Exprsn> ) <StmtBlock> $
-<IfStmt> -> if ( <Exprsn> ) <StmtBlock> else <StmtBlock> $
+<IfStmt> -> if ( <AddExprsn> <CompExprsn> ) <StmtBlock> else <StmtBlock> $
+<IfStmt> -> if ( <AddExprsn> <CompExprsn> ) <StmtBlock> $
 
-<Exprsn> -> <AddExprsn> $
-<Exprsn> -> <AddExprsn> <RelaOp> <Exprsn> $
+<CompExprsn> -> ε $
+<CompExprsn> -> <RelOp> <AddExprsn> <CompExprsn> $
 
-<RelaOp> -> < $
-<RelaOp> -> <= $
-<RelaOp> -> > $
-<RelaOp> -> >= $
-<RelaOp> -> == $
-<RelaOp> -> != $
+<RelOp> -> < $
+<RelOp> -> <= $
+<RelOp> -> > $
+<RelOp> -> >= $
+<RelOp> -> == $
+<RelOp> -> != $
 
-<AddExprsn> -> <Item> $
 <AddExprsn> -> <Item> + <AddExprsn> $
 <AddExprsn> -> <Item> - <AddExprsn> $
+<AddExprsn> -> <Item> $
 
-<Item> -> <Factor> $
 <Item> -> <Factor> * <Item> $
 <Item> -> <Factor> / <Item> $
+<Item> -> <Factor> $
 
 <Factor> -> num $
-<Factor> -> ( <Exprsn> ) $
-<Factor> -> ID <FactorType> $
-
-<FactorType> -> <FuncCall> $
-<FactorType> -> ε $
+<Factor> -> ( <AddExprsn> <CompExprsn> ) $
+<Factor> -> ID $
+<Factor> -> ID <FuncCall> $
 
 <FuncCall> -> ( <ActualArgs> ) $
 
 <ActualArgs> -> <ArgList> $
 <ActualArgs> -> ε $
 
-<ArgList> -> <Exprsn> $
-<ArgList> -> <Exprsn> , <ArgList> $
+<ArgList> -> <AddExprsn> <CompExprsn> , <ArgList> $
+<ArgList> -> <AddExprsn> <CompExprsn> $
