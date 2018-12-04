@@ -1,7 +1,7 @@
-int x = .3;
+float x = .3;
 int y = x * x;
-int z = (x > y);
-float w = x > y * (0.7 + b / (z != x)) - (x * x <= z);
+float z;
+int w = x > y * (0.7 + b / (z != x)) - (x * x <= z);
 
 float f1(int a) {
     int b = a * a;
@@ -14,7 +14,8 @@ void f2() {
 
 int main(void) {
     if(((f1(100) + f2(void) > 10.5)) != 100 + 25.9) {
-        return x;
+        float p = x + 2.5;
+        return p;
     } else {
         int q = 10 + w;
         return q;
