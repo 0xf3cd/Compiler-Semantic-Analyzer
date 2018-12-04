@@ -1,9 +1,9 @@
-int x = 3;
+int x = .3;
 int y = x * x;
 int z = (x > y);
-int w = x > y * (7 + b / (z != x)) - (x * x <= z);
+float w = x > y * (0.7 + b / (z != x)) - (x * x <= z);
 
-int f1(int a) {
+float f1(int a) {
     int b = a * a;
     return b;
 }
@@ -13,10 +13,11 @@ void f2() {
 }
 
 int main(void) {
-    if(((f1(100) + f2(void) > 10)) != 100) {
+    if(((f1(100) + f2(void) > 10.5)) != 100 + 25.9) {
         return x;
     } else {
-        return w;
+        int q = 10 + w;
+        return q;
     }
 }
 #

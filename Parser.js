@@ -1,3 +1,5 @@
+// LR Parser 类
+
 const LR = require('./LR.js');
 
 // 工具函数

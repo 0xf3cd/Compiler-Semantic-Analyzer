@@ -1,4 +1,4 @@
-25
+23
 S' 1
 S 2
 <Body> 3
@@ -9,51 +9,51 @@ S 2
 <StmtBlock> 8
 <ParamList> 9
 <Param> 10
-<InnerDecl> 11
-<Stmts> 12
-<InnerVarDecl> 13
-<Stmt> 14
-<IfStmt> 15
-<WhileStmt> 16
-<ReturnStmt> 17
-<AssignStmt> 18
-<Exprsn> 19
-<AddExprsn> 20
-<Item> 21
-<Factor> 22
-<FuncCall> 23
-<ActualArgs> 24
-<ArgList> 25
+<Stmts> 11
+<Stmt> 12
+<IfStmt> 13
+<WhileStmt> 14
+<ReturnStmt> 15
+<AssignStmt> 16
+<Exprsn> 17
+<AddExprsn> 18
+<Item> 19
+<Factor> 20
+<FuncCall> 21
+<ActualArgs> 22
+<ArgList> 23
 
-26
+28
 int 1
-void 2
-if 3
-else 4
-while 5
-return 6
-ID 7
-num 8
-= 9
-+ 10
-- 11
-* 12
-/ 13
-== 14
-!= 15
-< 16
-<= 17
-> 18
->= 19
-; 20
-, 21
-( 22
-) 23
-{ 24
-} 25
-ε 29
+float 2
+void 3
+if 4
+else 5
+while 6
+return 7
+ID 8
+inum 9
+fnum 10
+= 11
++ 12
+- 13
+* 14
+/ 15
+== 16
+!= 17
+< 18
+<= 19
+> 20
+>= 21
+; 22
+, 23
+( 24
+) 25
+{ 26
+} 27
+ε 28
 
-56
+58
 S' -> S $
 
 S -> <Body> $
@@ -61,14 +61,17 @@ S -> <Body> S $
 
 <Body> -> <Decl> $
 
-<Decl> -> int ID <VarDecl> $
-<Decl> -> int ID <FuncDecl> $
-<Decl> -> void ID <FuncDecl> $
+<Decl> -> <VarDecl> $
+<Decl> -> <FuncDecl> $
 
-<VarDecl> -> ; $
-<VarDecl> -> = <Exprsn> ; $
+<VarDecl> -> int ID ; $
+<VarDecl> -> int ID = <Exprsn> ; $
+<VarDecl> -> float ID = <Exprsn> ; $
+<VarDecl> -> float ID = <Exprsn> ; $
 
-<FuncDecl> -> ( <FormalParams> ) <StmtBlock> $
+<FuncDecl> -> int ID  ( <FormalParams> ) <StmtBlock> $
+<FuncDecl> -> float ID  ( <FormalParams> ) <StmtBlock> $
+<FuncDecl> -> void ID  ( <FormalParams> ) <StmtBlock> $
 
 <FormalParams> -> <ParamList> $
 <FormalParams> -> void $
@@ -78,18 +81,14 @@ S -> <Body> S $
 <ParamList> -> <Param> , <ParamList> $
 
 <Param> -> int ID $
+<Param> -> float ID $
 
-<StmtBlock> -> { <InnerDecl> <Stmts> } $
-
-<InnerDecl> -> <InnerVarDecl> ; <InnerDecl> $
-<InnerDecl> -> ε $
-
-<InnerVarDecl> -> int ID $
-<InnerVarDecl> -> int ID = <Exprsn> $
+<StmtBlock> -> { <Stmts> } $
 
 <Stmts> -> <Stmt> <Stmts> $
 <Stmts> -> <Stmt> $
 
+<Stmt> -> <VarDecl> $
 <Stmt> -> <IfStmt> $
 <Stmt> -> <WhileStmt> $
 <Stmt> -> <ReturnStmt> $
@@ -121,7 +120,8 @@ S -> <Body> S $
 <Item> -> <Factor> / <Item> $
 <Item> -> <Factor> $
 
-<Factor> -> num $
+<Factor> -> inum $
+<Factor> -> fnum $
 <Factor> -> ( <Exprsn> ) $
 <Factor> -> ID $
 <Factor> -> ID <FuncCall> $
