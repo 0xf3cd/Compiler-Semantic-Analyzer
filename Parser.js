@@ -180,14 +180,14 @@ class Parser {
          * @private
          * @type {string}
          */
-        this._grammarDir = './TestFile/Grammar.txt';
+        this._grammarDir = __dirname + '/Grammar/Grammar.txt';
 
         /**
          * 待分析源代码文件的位置，赋了初值
          * @private
          * @type {string}
          */
-        this._sourceDir = './TestFile/example.cmm';
+        this._sourceDir = __dirname + '/Source/Example.cmm';
 
         /**
          * 指示当前状况
@@ -253,8 +253,8 @@ Parser.prototype.initialize = function() {
  * @public
  */
 Parser.prototype.reset = function() {
-    this._grammarDir = './TestFile/Grammar.txt';
-    this._sourceDir = './TestFile/example.cmm';
+    this._grammarDir = __dirname + '/Grammar/Grammar.txt';
+    this._sourceDir = __dirname + '/Source/Example.cmm';
     this._parserState = -1;
     this._records = new Array();
     this._topNodes = new Array();
