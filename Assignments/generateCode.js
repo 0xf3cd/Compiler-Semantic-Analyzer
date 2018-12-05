@@ -8,6 +8,6 @@ for(let i = 1; i <= 58; i++) {
 }
 
 for(let i = 1; i <= 58; i++) {
-    const content = `this._allFuncs[${i}] = this._f${i};`;
+    const content = `this._allFuncs[${i}] = f${i};`;
     console.log(content)
 }
