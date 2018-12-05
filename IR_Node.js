@@ -80,4 +80,4 @@ class Node {
     }
 }
 
-module.exports = IR_Node;
+module.exports = Node;

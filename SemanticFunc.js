@@ -3,6 +3,44 @@
 
 const Node = require('./IR_Node.js');
 
+// 工具函数
+/**
+ * deepCopy 函数说明: 进行深拷贝，将 oldObject 深拷贝至 newObject
+ * 可以对传入参数中的数组和对象递归进行深拷贝
+ * @param {*} oldObject
+ * @return {Object}: 一个值与 oldObject 相同的对象
+ */
+const deepCopy = function(oldObject) {
+	if(typeof(oldObject) !== 'object' && Array.isArray(oldObject) !== true) {
+		return oldObject;
+	}
+	let newObject;
+
+	if(Array.isArray(oldObject)) {
+		newObject = new Array();
+		for(let each of oldObject) {
+			if(typeof(each) === 'object' || Array.isArray(each)) {
+				newObject.push(deepCopy(each));
+			} else {
+				newObject.push(each);
+			}
+		}
+	} else {
+		newObject = new Object();
+		for(let each in oldObject) {
+			if(oldObject[each] === null || oldObject[each] === undefined) {
+				newObject[each] = oldObject[each];
+			} else if(typeof(oldObject[each]) === 'object' && !oldObject[each].length) {
+				newObject[each] = deepCopy(oldObject[each]);
+			} else {
+				newObject[each] = oldObject[each];
+			}
+		}
+	}
+	
+	return newObject;
+};
+
 /**
  * 记录 (产生式编号, 函数) 键值对的 Map
  * 产生式编号为 1 - 58 中的一个整数
@@ -297,12 +335,22 @@ allFuncs[56] = f56;
 
 const f57 = function(right) {
 	// <ArgList> -> <Exprsn> , <ArgList> $ 57
+	const A1 = new Node();
+	const E = right[0];
+	const A2 = right[2];
+
+	
+	return A1;
 };
 allFuncs[57] = f57;
 
 const f58 = function(right) {
     // <ArgList> -> <Exprsn> $ 58
-    
+	const A = new Node();
+	const E = right[0];
+	A.args.unshift(E.val);
+	A.argType.unshift(E.valType);
+	return A;
 };
 allFuncs[58] = f58;
 
