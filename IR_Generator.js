@@ -364,7 +364,17 @@ const f20 = function(right, VST, FST) {
  * @return {Node}
  */
 const f21 = function(right, VST, FST) {
-	// <StmtBlock> -> { <Stmts> } $ 21
+    // <StmtBlock> -> { <Stmts> } $ 21
+    const SB = new Node();
+    const S = deepCopy(right[1]);
+
+    SB.IR = S.IR;
+    SB.returnType = S.returnType;
+    for(let i = 0; i < S.innerVarAmount; i++) {
+        VST.remove(); //离开一个语句块时，将块内声明的变量全部从符号表中移除
+    }
+
+    return SB;
 };
 
 /**
@@ -375,7 +385,21 @@ const f21 = function(right, VST, FST) {
  * @return {Node}
  */
 const f22 = function(right, VST, FST) {
-	// <Stmts> -> <Stmt> <Stmts> $ 22
+    // <Stmts> -> <Stmt> <Stmts> $ 22
+    const Ss1 = new Node();
+    const S = deepCopy(right[0]);
+    const Ss2 = deepCopy(right[1]);
+
+    if(S.returnType !== Ss2.returnType) {
+        const errorInfo = 'Can\'t return values of different types in a function';
+        throw new Error(errorInfo);
+    }
+
+    Ss1.IR = S.IR + Ss2.IR;
+    Ss1.returnType = S.returnType;
+    Ss1.innerVarAmount = S.innerVarAmount + Ss2.innerVarAmount;
+
+    return Ss1;
 };
 
 /**
@@ -386,7 +410,15 @@ const f22 = function(right, VST, FST) {
  * @return {Node}
  */
 const f23 = function(right, VST, FST) {
-	// <Stmts> -> <Stmt> $ 23
+    // <Stmts> -> <Stmt> $ 23
+    const Ss = new Node();
+    const S = deepCopy(right[0]);
+
+    Ss.IR = S.IR;
+    Ss.returnType = S.returnType;
+    Ss.innerVarAmount = S.innerVarAmount;
+
+    return Ss;
 };
 
 /**
@@ -397,7 +429,15 @@ const f23 = function(right, VST, FST) {
  * @return {Node}
  */
 const f24 = function(right, VST, FST) {
-	// <Stmt> -> <VarDecl> $ 24
+    // <Stmt> -> <VarDecl> $ 24
+    const S = new Node();
+    const VD = deepCopy(right[0]);
+
+    S.IR = VD.IR;
+    S.returnType = 'void';
+    S.innerVarAmount++;
+
+    return S;
 };
 
 /**
@@ -408,7 +448,14 @@ const f24 = function(right, VST, FST) {
  * @return {Node}
  */
 const f25 = function(right, VST, FST) {
-	// <Stmt> -> <IfStmt> $ 25
+    // <Stmt> -> <IfStmt> $ 25
+    const S = new Node();
+    const IS = deepCopy(right[0]);
+
+    S.IR = IS.IR;
+    S.returnType = IS.returnType;
+
+    return S;
 };
 
 /**
@@ -419,7 +466,14 @@ const f25 = function(right, VST, FST) {
  * @return {Node}
  */
 const f26 = function(right, VST, FST) {
-	// <Stmt> -> <WhileStmt> $ 26
+    // <Stmt> -> <WhileStmt> $ 26
+    const S = new Node();
+    const WS = deepCopy(right[0]);
+
+    S.IR = WS.IR;
+    S.returnType = WS.returnType;
+
+    return S;
 };
 
 /**
@@ -430,7 +484,14 @@ const f26 = function(right, VST, FST) {
  * @return {Node}
  */
 const f27 = function(right, VST, FST) {
-	// <Stmt> -> <ReturnStmt> $ 27
+    // <Stmt> -> <ReturnStmt> $ 27
+    const S = new Node();
+    const RS = deepCopy(right[0]);
+
+    S.IR = RS.IR;
+    S.returnType = RS.returnType;
+
+    return S;
 };
 
 /**
@@ -441,7 +502,14 @@ const f27 = function(right, VST, FST) {
  * @return {Node}
  */
 const f28 = function(right, VST, FST) {
-	// <Stmt> -> <AssignStmt> $ 28
+    // <Stmt> -> <AssignStmt> $ 28
+    const S = new Node();
+    const AS = deepCopy(right[0]);
+
+    S.IR = AS.IR;
+    S.returnType = 'void';
+
+    return S;
 };
 
 /**
@@ -452,7 +520,38 @@ const f28 = function(right, VST, FST) {
  * @return {Node}
  */
 const f29 = function(right, VST, FST) {
-	// <AssignStmt> -> ID = <Exprsn> ; $ 29
+    // <AssignStmt> -> ID = <Exprsn> ; $ 29
+    const A = new Node();
+    const ID = deepCopy(right[0]);
+    const E = deepCopy(right[2]);
+
+    if(!VST.hasVar(ID.val)) {
+        const errorInfo = 'Use a var without declaration';
+        throw new Error(errorInfo);
+    }
+    if(VST.getVarType(ID.val) !== E.valType) {
+        const errorInfo = 'Can\'t assign to a var of different type';
+        throw new Error(errorInfo);
+    }
+    // 至此变量检查结束
+    
+    const newTemp1 = TA.getNewTemp(); // 指针
+    const newTemp2 = TA.getNewTemp();
+    const varType = (E.valType === 'int')? 'i32': 'float';
+    let storeVal;
+    if(hasLetter(E.val)) {
+        storeVal = '%' + E.val;
+    } else {
+        storeVal = (E.valType === 'int')? E.val: representFloat(E.val);
+    }
+
+    A.IR += E.IR;
+    A.IR += `%${newTemp1} = alloca ${varType}\n`;
+    A.IR += `store ${varType} ${storeVal}, ${varType}* ${newTemp1}\n`;
+    A.IR += `%${newTemp2} = load ${varType}, ${varType}* ${newTemp1}\n`;  // 此时 newTemp2 中储存着带返回值
+    A.IR += `ret ${varType} ${newTemp2}\n`; 
+
+    return A;
 };
 
 /**
@@ -463,7 +562,20 @@ const f29 = function(right, VST, FST) {
  * @return {Node}
  */
 const f30 = function(right, VST, FST) {
-	// <ReturnStmt> -> return <Exprsn> ; $ 30
+    // <ReturnStmt> -> return <Exprsn> ; $ 30
+    const RS = new Node();
+    const E = deepCopy(right[1]);
+
+    RS.returnType = E.valType;
+    let rtValue;
+    if(E.valType === 'int') {
+        rtValue = 'i32 ' + (hasLetter(E.val)? `%${E.val}`: E.val);
+    } else {
+        rtValue = 'float ' + (hasLetter(E.val)? `%${E.val}`: representFloat(E.val));
+    }
+    RS.IR = 'ret ' + rtValue + '\n';
+
+    return RS;
 };
 
 /**
@@ -475,7 +587,12 @@ const f30 = function(right, VST, FST) {
  */
 const f31 = function(right, VST, FST) {
     // <ReturnStmt> -> return ; $ 31
-    
+    const RS = new Node();
+
+    RS.returnType = 'void';
+    RS.IR = 'ret void\n';
+
+    return RS;
 };
 
 /**
