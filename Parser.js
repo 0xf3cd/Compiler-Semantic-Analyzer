@@ -345,6 +345,8 @@ Parser.prototype.getNext = function() {
         // console.log('error');
         jss.au = 'error';
         this._parserState = -2;
+        const errorInfo = `Error ${jss.error} occured in "${this._sourceDir}" line ${jss.token.line_num}`;
+        throw new Error(errorInfo);
     }
 
     let record = new Record();

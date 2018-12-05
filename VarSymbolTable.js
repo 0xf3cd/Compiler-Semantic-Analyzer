@@ -31,8 +31,9 @@ class VarSymbolTable {
         /**
          * 表名
          * @private
+         * @type {string}
          */
-        this._tableName = null;
+        this._tableName = 'default';
 
         /**
          * 记录变量名的数组
