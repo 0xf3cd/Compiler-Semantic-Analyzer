@@ -2,14 +2,17 @@
 
 ## 说明
 
-- 项目延续 LR 分析方法的语法分析器
+- 项目基于先前 LR 分析方法的语法分析器，增加了 `float` 类型的数据，同时调整了文法，使得文法更为简洁
 - 由 C++ 完成了链接库 `LR.dll` 及 `LR.dylib`
 - 后续工作由 JavaScript 完成，使用 `Electron` 作为跨平台的图形开发框架
 - 使用 `ffi, ref-struct` 等 node 库来调用动态链接库
-- `./Dylib/` 中存放 Mac 和 Windows 下的动态链接库
-- `./TestFile` 中存放语法描述文件和待分析源代码
+- `./DyLib/` 中存放 Mac 和 Windows 下的动态链接库
+- `./Grammar/` 中存放语法描述文件
+- `./Source/` 中存放待分析源代码
+- `./IR/` 中存放生成的中间代码
 - `./LR.js` 是已经通过 `ffi` `ref-struct` 封装好的 js 库，可以直接在其他 js 模块中调用
-- `./main.js` 中调用 `LR.js` 从而完成了语法分析，具体可以运行 `node main.js`
+- `./main.js` 中调用 `Parser.js` 从而完成了语法分析，具体可以运行 `node main.js`
+- 详细终结符和产生式定义，请参见 `./Assignment/*.pdf`
 
 
 ## 准备工作 1 - NVM
@@ -62,11 +65,12 @@
 ## 之后的工作
 
 1.  ~~将动态链接库包装成 js 可以直接使用的函数，并封装在 `LR.js `模块中~~
-2.  ~~生成语法分析树~~ 和 抽象语法树
-3.  进行语义分析
-4.  生成中间代码
-5.  开发图形界面 with `HTML，CSS，JavaScript`
-6.  利用 `Electron` 打包成为桌面应用，`Electron` 可以理解成 `Node.js` 中的一个库（和 `ffi` 一样是库）
+2.  ~~生成语法分析树~~
+3.  ~~调整文法，进行语义动作设计~~ 具体文法和终结符可以参见 `./Assignments/*.pdf`
+4.  进行语义分析（包括类型检查等） 
+5.  生成中间代码
+6.  开发图形界面 with `HTML，CSS，JavaScript`
+7.  利用 `Electron` 打包成为桌面应用，`Electron` 可以理解成 `Node.js` 中的一个库（和 `ffi` 一样是库）
 
 
 ## 变元表
@@ -99,7 +103,7 @@
 |  14  |   \<WhileStmt\>    |     while语句      |                                         |
 |  15  |   \<ReturnStmt\>   |     return语句     |                                         |
 |  16  |   \<AssignStmt\>   |      赋值语句      |                                         |
-|  17  |     \<Exprsn\>     |       表达式       |                                         |
+|  17  |     \<Exprsn\>     |       表达式       |         Exprsn for Expression         |
 |  18  |   \<AddExprsn\>    |     加法表法式     |                                         |
 |  19  |      \<Item\>      |         项         |                                         |
 |  20  |     \<Factor\>     |        因子        |      因子与因子间可能有乘法或除法       |
