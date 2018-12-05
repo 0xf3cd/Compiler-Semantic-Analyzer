@@ -3,6 +3,11 @@ const data = fs.readFileSync('../Grammar/Production-No.txt').toString();
 const prods = data.split('\n');
 
 for(let i = 1; i <= 58; i++) {
-    const funcContent = `const f${i} = function(right) {\n\t// ${prods[i-1]}\n};\nallFuncs[${i}] = f${i};\n`;
+    const funcContent = `IR_Generator.prototype._f${i} = function(right) {\n\t// ${prods[i-1]}\n};\n`;
     console.log(funcContent)
+}
+
+for(let i = 1; i <= 58; i++) {
+    const content = `this._allFuncs[${i}] = this._f${i};`;
+    console.log(content)
 }
