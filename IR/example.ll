@@ -52,7 +52,7 @@ define float @itof(i32) {
 }
 
 ;%4 = icmp sle i32 %3, 1;sgt > sge >=  slt < sle <= eq == ne !=
-
+; fcmp ogt> oge>= olt< ole<= oeq== une!=
 define i32 @main() {
     %tmp1 = call i32 @readi()
     %tmp2 = icmp eq i32 %tmp1, 100

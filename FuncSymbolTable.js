@@ -54,19 +54,18 @@ class FuncSymbolTable {
 /**
  * 检查函数表中是否有对应的函数
  * @public
- * @param funcName {string} 函数名
- * @param returnType {string} 返回值类型
- * @param paramType {Array.<string>} 函数参数类型数组
+ * @param {string} funcName 函数名
+ * @param {Array.<string>} paramType 函数参数类型数组
  * @return {boolean} 
  */
-FuncSymbolTable.prototype.hasFunc = function(funcName, returnType, paramType) {
+FuncSymbolTable.prototype.hasFunc = function(funcName, paramType) {
     for(let i = 0; i < this._table.length; i++) { // 遍历函数表
         const each = this._table[i];
         let isTypeSame = true;
 
-        if(returnType !== each.returnType) {
-            continue;
-        }
+        // if(returnType !== each.returnType) {
+        //     continue;
+        // }
         if(funcName !== each.funcName) {
             continue;
         }
@@ -91,12 +90,28 @@ FuncSymbolTable.prototype.hasFunc = function(funcName, returnType, paramType) {
 };
 
 /**
+ * 得到函数的返回类型，若不存在函数则返回 null
+ * @public
+ * @param {string} funcName 函数名
+ * @return {string}
+ */
+FuncSymbolTable.prototype.getReturnType = function(funcName) {
+    for(let i = 0; i < this._table.length; i++) { // 遍历函数表
+        const each = this._table[i];
+        if(funcName === each.funcName) {
+            return each.returnType;
+        }
+    }
+    return null;
+};
+
+/**
  * 在函数表中添加一项
  * @public
- * @param funcName {string} 函数名
- * @param returnType {string} 返回值类型
- * @param paramType {Array.<string>} 函数参数类型数组
- * @param paramName {Array.<string>} 函数参数名数组
+ * @param {string} funcName 函数名
+ * @param {string} returnType 返回值类型
+ * @param {Array.<string>} paramType 函数参数类型数组
+ * @param {Array.<string>} paramName 函数参数名数组
  */
 FuncSymbolTable.prototype.append = function(funcName, returnType, paramType, paramName) {
     let newItem = new FuncItem();

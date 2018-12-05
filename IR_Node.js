@@ -6,7 +6,7 @@ class Node {
     constructor() {
         /**
          * 结点名
-         * 如 'S' '<FuncDecl>' 'Stmt'
+         * 如 'S' '<FuncDecl>' '<Stmt>'
          * @public
          * @type {string}
          */
