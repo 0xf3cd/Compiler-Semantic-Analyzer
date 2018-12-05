@@ -474,7 +474,8 @@ const f30 = function(right, VST, FST) {
  * @return {Node}
  */
 const f31 = function(right, VST, FST) {
-	// <ReturnStmt> -> return ; $ 31
+    // <ReturnStmt> -> return ; $ 31
+    
 };
 
 /**
@@ -485,7 +486,33 @@ const f31 = function(right, VST, FST) {
  * @return {Node}
  */
 const f32 = function(right, VST, FST) {
-	// <WhileStmt> -> while ( <Exprsn> ) <StmtBlock> $ 32
+    // <WhileStmt> -> while ( <Exprsn> ) <StmtBlock> $ 32
+    const WS = new Node();
+    const E = deepCopy(right[2]);
+    const SB = deepCopy(right[4]);
+
+    if(E.valType !== 'int') {
+        const errorInfo = 'If branch condition must be of int';
+        throw new Error(errorInfo);
+    }
+    // 类型检查通过
+    WS.returnType = SB.returnType;   
+    
+    const newTemp1 = TA.getNewTemp(); // i1 
+    const newLabel1 = LA.getNewLabel();
+    const newLabel2 = LA.getNewLabel();
+    const newLabel3 = LA.getNewLabel();
+
+    WS.IR += `${newLabel1}:\n`;
+    WS.IR += E.IR;
+    WS.IR += `%${newTemp1} = icmp eq i32 ${hasLetter(E.val)? ('%' + E.val): E.val}, 1\n`;
+    WS.IR += `br i1 %${newTemp1}, label %${newLabel2}, label %${newLabel3}\n`;
+    WS.IR += `${newLabel2}:\n`;
+    WS.IR += SB.IR;
+    WS.IR += `br label %${newLabel1}\n`;
+    WS.IR += `${newLabel3}:\n`;
+
+    return WS;
 };
 
 /**
@@ -496,7 +523,39 @@ const f32 = function(right, VST, FST) {
  * @return {Node}
  */
 const f33 = function(right, VST, FST) {
-	// <IfStmt> -> if ( <Exprsn> ) <StmtBlock> else <StmtBlock> $ 33
+    // <IfStmt> -> if ( <Exprsn> ) <StmtBlock> else <StmtBlock> $ 33
+    const IS = new Node();
+    const E = deepCopy(right[2]);
+    const SB1 = deepCopy(right[4]);
+    const SB2 = deepCopy(right[6]);
+
+    if(SB1.returnType !== SB2.returnType) {
+        const errorInfo = 'The values returnd have different types';
+        throw new Error(errorInfo);
+    }
+    if(E.valType !== 'int') {
+        const errorInfo = 'If branch condition must be of int';
+        throw new Error(errorInfo);
+    }
+    // 类型检查通过
+    IS.returnType = SB1.returnType;
+
+    const newTemp1 = TA.getNewTemp(); // i1 
+    const newLabel1 = LA.getNewLabel();
+    const newLabel2 = LA.getNewLabel();
+    const newLabel3 = LA.getNewLabel();
+
+    IS.IR += E.IR;
+    IS.IR += `%${newTemp1} = icmp eq i32 ${hasLetter(E.val)? ('%' + E.val): E.val}, 1\n`;
+    IS.IR += `br i1 %${newTemp1}, label %${newLabel1}, label %${newLabel2}\n`;
+    IS.IR += `${newLabel1}:\n`;
+    IS.IR += SB1.IR;
+    IS.IR += `br label %${newLabel3}\n`;
+    IS.IR += `${newLabel2}:\n`;
+    IS.IR += SB2.IR;
+    IS.IR += `${newLabel3}:\n`;
+
+    return IS;
 };
 
 /**
@@ -507,7 +566,35 @@ const f33 = function(right, VST, FST) {
  * @return {Node}
  */
 const f34 = function(right, VST, FST) {
-	// <IfStmt> -> if ( <Exprsn> ) <StmtBlock> $ 34
+    // <IfStmt> -> if ( <Exprsn> ) <StmtBlock> $ 34
+    const IS = new Node();
+    const E = deepCopy(right[2]);
+    const SB = deepCopy(right[4]);
+
+    if(E.valType !== 'int') {
+        const errorInfo = 'If branch condition must be of int';
+        throw new Error(errorInfo);
+    }
+    // 类型检查通过
+
+    IS.returnType = SB.returnType;
+    // for(let i = 0; i < SB.innerVarAmount; i++) {
+    //     // 离开一个语句块时，将其中声明的变量从符号表中移除
+    //     VST.remove();
+    // }
+
+    const newTemp1 = TA.getNewTemp(); // i1 
+    const newLabel1 = LA.getNewLabel();
+    const newLabel2 = LA.getNewLabel();
+
+    IS.IR += E.IR;
+    IS.IR += `%${newTemp1} = icmp eq i32 ${hasLetter(E.val)? ('%' + E.val): E.val}, 1\n`;
+    IS.IR += `br i1 %${newTemp1}, label %${newLabel1}, label %${newLabel2}\n`;
+    IS.IR += `${newLabel1}:\n`;
+    IS.IR += SB.IR;
+    IS.IR += `${newLabel2}:\n`;
+
+    return IS;
 };
 
 /**
@@ -518,7 +605,15 @@ const f34 = function(right, VST, FST) {
  * @return {Node}
  */
 const f35 = function(right, VST, FST) {
-	// <Exprsn> -> <AddExprsn> $ 35
+    // <Exprsn> -> <AddExprsn> $ 35
+    const E = new Node();
+    const A = deepCopy(right[0]);
+
+    E.val = A.val;
+    E.valType = A.valType;
+    E.IR = A.IR;
+
+    return E;
 };
 
 /**
@@ -532,7 +627,7 @@ const f36 = function(right, VST, FST) {
     // <Exprsn> -> <AddExprsn> < <Exprsn> $ 36
     const E1 = new Node();
     const A = deepCopy(right[0]);
-    const E2 = deepCopy(right[1]);
+    const E2 = deepCopy(right[2]);
 
     if(A.valType !== E2.valType) {
         const errorInfo = 'Two operands have different type';
@@ -587,7 +682,7 @@ const f37 = function(right, VST, FST) {
     // <Exprsn> -> <AddExprsn> <= <Exprsn> $ 37
     const E1 = new Node();
     const A = deepCopy(right[0]);
-    const E2 = deepCopy(right[1]);
+    const E2 = deepCopy(right[2]);
 
     if(A.valType !== E2.valType) {
         const errorInfo = 'Two operands have different type';
@@ -642,7 +737,7 @@ const f38 = function(right, VST, FST) {
     // <Exprsn> -> <AddExprsn> > <Exprsn> $ 38
     const E1 = new Node();
     const A = deepCopy(right[0]);
-    const E2 = deepCopy(right[1]);
+    const E2 = deepCopy(right[2]);
 
     if(A.valType !== E2.valType) {
         const errorInfo = 'Two operands have different type';
@@ -697,7 +792,7 @@ const f39 = function(right, VST, FST) {
     // <Exprsn> -> <AddExprsn> >= <Exprsn> $ 39
     const E1 = new Node();
     const A = deepCopy(right[0]);
-    const E2 = deepCopy(right[1]);
+    const E2 = deepCopy(right[2]);
 
     if(A.valType !== E2.valType) {
         const errorInfo = 'Two operands have different type';
@@ -752,7 +847,7 @@ const f40 = function(right, VST, FST) {
     // <Exprsn> -> <AddExprsn> == <Exprsn> $ 40
     const E1 = new Node();
     const A = deepCopy(right[0]);
-    const E2 = deepCopy(right[1]);
+    const E2 = deepCopy(right[2]);
 
     if(A.valType !== E2.valType) {
         const errorInfo = 'Two operands have different type';
@@ -807,7 +902,7 @@ const f41 = function(right, VST, FST) {
     // <Exprsn> -> <AddExprsn> != <Exprsn> $ 41
     const E1 = new Node();
     const A = deepCopy(right[0]);
-    const E2 = deepCopy(right[1]);
+    const E2 = deepCopy(right[2]);
 
     if(A.valType !== E2.valType) {
         const errorInfo = 'Two operands have different type';
@@ -862,7 +957,7 @@ const f42 = function(right, VST, FST) {
     // <AddExprsn> -> <Item> + <AddExprsn> $ 42
     const A1 = new Node();
     const I = deepCopy(right[0]);
-    const A2 = deepCopy(right[1]);
+    const A2 = deepCopy(right[2]);
 
     if(I.valType !== A2.valType) {
         const errorInfo = 'Two operands have different type';
@@ -906,7 +1001,7 @@ const f43 = function(right, VST, FST) {
     // <AddExprsn> -> <Item> - <AddExprsn> $ 43
     const A1 = new Node();
     const I = deepCopy(right[0]);
-    const A2 = deepCopy(right[1]);
+    const A2 = deepCopy(right[2]);
 
     if(I.valType !== A2.valType) {
         const errorInfo = 'Two operands have different type';
@@ -969,7 +1064,7 @@ const f45 = function(right, VST, FST) {
     // <Item> -> <Factor> * <Item> $ 45
     const I1 = new Node();
     const F = deepCopy(right[0]);
-    const I2 = deepCopy(right[1]);
+    const I2 = deepCopy(right[2]);
 
     if(F.valType !== I2.valType) {
         const errorInfo = 'Two operands have different type';
@@ -1013,7 +1108,7 @@ const f46 = function(right, VST, FST) {
     // <Item> -> <Factor> / <Item> $ 46
     const I1 = new Node();
     const F = deepCopy(right[0]);
-    const I2 = deepCopy(right[1]);
+    const I2 = deepCopy(right[2]);
 
     if(F.valType !== I2.valType) {
         const errorInfo = 'Two operands have different type';
@@ -1111,7 +1206,7 @@ const f49 = function(right, VST, FST) {
 const f50 = function(right, VST, FST) {
     // <Factor> -> ( <Exprsn> ) $ 50
     const F = new Node();
-    const E = deepCopy(right[0]);
+    const E = deepCopy(right[1]);
 
     F.val = E.val;
     F.valType = E.valType;
@@ -1204,7 +1299,7 @@ const f52 = function(right, VST, FST) {
 const f53 = function(right, VST, FST) {
 	// <FuncCall> -> ( <ActualArgs> ) $ 53
 	const F = new Node();
-	const Ac = deepCopy(right[0]);
+	const Ac = deepCopy(right[1]);
 
 	F.args = Ac.args;
     F.argType = Ac.argType;
@@ -1365,9 +1460,28 @@ class IR_Generator {
          */
         this._allFuncs = new Map();
 
-        this.initialize();
+        this._initialize();
     }
 }
+
+/**
+ * 初始化函数，将 f1 - f58 加入 this.allFuncs 中
+ * @private
+ */
+IR_Generator.prototype._initialize = function() {
+    for(let i = 1; i <= 58; i++) {
+        const code = `this._allFuncs[${i}] = f${i};`;
+        eval(code); // 执行上述代码
+    }
+};
+
+/**
+ * 根据传入的 Record 对象，选取本次规约应当使用的语义分析和处理函数
+ * @private
+ * @param {Object} record 
+ * @return {Function} 返回应该执行的处理函数
+ */
+IR_Generator.prototype._getFunc = function(record) {};
 
 /**
  * 设置文件地址
@@ -1405,30 +1519,16 @@ IR_Generator.prototype.readProdNoFile = function() {
 };
 
 /**
- * 根据传入的 Record 对象，选取本次规约应当使用的语义分析和处理函数
- * @private
- * @param {Object} record 
- * @return {Function} 返回应该执行的处理函数
- */
-IR_Generator.prototype._getFunc = function(record) {};
-
-/**
  * 根据传入的 Record 对象，进行一次语义分析操作
  * @public
  * @param {Object} record
  */
 IR_Generator.prototype.analyze = function(record) {};
 
-IR_Generator.prototype.initialize = function() {
-    for(let i = 1; i <= 58; i++) {
-        const code = `this._allFuncs[${i}] = f${i};`;
-        eval(code); // 执行上述代码
-    }
-};
 
 const IR = new IR_Generator();
 IR.readProdNoFile();
-const x = IR._allFuncs[51];
-x();
+// const x = IR._allFuncs[51];
+// x();
 
 module.exports = IR_Generator;

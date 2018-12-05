@@ -78,6 +78,16 @@ VarSymbolTable.prototype.append = function(varName, varType) {
 };
 
 /**
+ * 移除变量
+ * @public
+ * @return {VarItem}
+ */
+VarSymbolTable.prototype.remove = function() {
+    const removedItem = this._table.pop();
+    return removedItem;
+};
+
+/**
  * 查询是否有某名字的变量
  * @public
  * @param varName {string}
