@@ -114,4 +114,15 @@ FuncSymbolTable.prototype.append = function(funcName, returnType, paramType, par
     this._table.push(newItem);
 };
 
+// const F = new FuncSymbolTable();
+
+// F.append('write', 'void', ['int'], ['a']);
+// F.append('write2', 'void', ['float'], ['a']);
+
+// console.log(F.hasFunc('write', 'void', ['int']));
+// console.log(F.hasFunc('write', 'void', ['float']));
+// console.log(F.hasFunc('write2', 'void', ['int']));
+// console.log(F.hasFunc('write2', 'void', ['float']));
+// console.log();
+
 module.exports = FuncSymbolTable;

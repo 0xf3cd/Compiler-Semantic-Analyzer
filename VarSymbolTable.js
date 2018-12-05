@@ -107,4 +107,16 @@ VarSymbolTable.prototype.getVarType = function(varName) {
     return null;
 };
 
+// const V = new VarSymbolTable();
+
+// V.setTableName('global');
+// console.log(V.getTableName());
+// V.append('a', 'int');
+// V.append('b', 'float');
+// console.log(V.hasVar('a'));
+// console.log(V.hasVar('c'));
+// console.log(V.getVarType('b'));
+// console.log(V.getVarType('d'));
+// console.log();
+
 module.exports = VarSymbolTable;
