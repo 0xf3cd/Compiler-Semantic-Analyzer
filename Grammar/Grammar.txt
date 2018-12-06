@@ -53,7 +53,7 @@ fnum 10
 } 27
 ε 28
 
-58
+59
 S' -> S $
 
 S -> <Body> $
@@ -93,6 +93,7 @@ S -> <Body> S $
 <Stmt> -> <WhileStmt> $
 <Stmt> -> <ReturnStmt> $
 <Stmt> -> <AssignStmt> $
+<Stmt> -> ID <FuncCall> ; $
 
 <AssignStmt> -> ID = <Exprsn> ; $
 

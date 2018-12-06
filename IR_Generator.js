@@ -359,6 +359,11 @@ const f10 = function(right, VST, FST) {
 
 const f11 = function(right, VST, FST) {
     // <FuncDecl> -> int ID  ( <FormalParams> ) <StmtBlock> $ 11
+    const FD = new Node();
+    const ID = deepCopy(right[1]);
+    const FP = deepCopy(right[3]);
+    const SB = deepCopy(right[5]);
+
     if(SB.returnType !== 'int') {
         const errorInfo = 'Return type differs from function declaration';
         throw new Error(errorInfo);
@@ -372,10 +377,14 @@ const f11 = function(right, VST, FST) {
         throw new Error(errorInfo);
     }
 
-    FD.IR += `define int @${ID.val}(${FP.IR}) {\n`;
+    FD.IR += `define i32 @${ID.val}(${FP.IR}) {\n`;
     FD.IR += SB.IR;
     FD.IR += `}\n`;
     FST.append(ID.val, 'int', FP.paramType, FP.paramName);
+
+    for(let i = 0; i < FP.paramName.length; i++) {
+        VST.remove();
+    } // 将之前压入符号表的形式参数弹出
 
     return FD;
 };
@@ -404,6 +413,10 @@ const f12 = function(right, VST, FST) {
     FD.IR += SB.IR;
     FD.IR += `}\n`;
     FST.append(ID.val, 'float', FP.paramType, FP.paramName);
+
+    for(let i = 0; i < FP.paramName.length; i++) {
+        VST.remove();
+    } // 将之前压入符号表的形式参数弹出
 
     return FD;
 };
@@ -438,6 +451,10 @@ const f13 = function(right, VST, FST) {
     FD.IR += `}\n`;
     FST.append(ID.val, 'void', FP.paramType, FP.paramName);
 
+    for(let i = 0; i < FP.paramName.length; i++) {
+        VST.remove();
+    } // 将之前压入符号表的形式参数弹出
+
     return FD;
 };
 
@@ -449,6 +466,10 @@ const f14 = function(right, VST, FST) {
     FP.paramName = P.paramName;
     FP.paramType = P.paramType;
     FP.IR = P.IR;
+
+    for(let i = 0; i < FP.paramName.length; i++) {
+        VST.append(FP.paramName[i], FP.paramType[i]);
+    } // 将形式参数压入符号表
 
     return FP;
 };
@@ -547,13 +568,22 @@ const f22 = function(right, VST, FST) {
     const S = deepCopy(right[0]);
     const Ss2 = deepCopy(right[1]);
 
-    if(S.returnType !== Ss2.returnType) {
-        const errorInfo = 'Can\'t return values of different types in a function';
-        throw new Error(errorInfo);
+    if(S.returnType === 'void') {
+        Ss1.returnType = Ss2.returnType;
+    } else {
+        if(Ss2.returnType === 'void') {
+            Ss1.returnType = S.returnType;
+        } else {
+            if(S.returnType === Ss2.returnType) {
+                Ss1.returnType = S.returnType;
+            } else {
+                const errorInfo = 'Can\'t return values of different types in a function';
+                throw new Error(errorInfo);
+            }
+        }
     }
 
     Ss1.IR = S.IR + Ss2.IR;
-    Ss1.returnType = S.returnType;
     Ss1.innerVarAmount = S.innerVarAmount + Ss2.innerVarAmount;
 
     return Ss1;
@@ -628,7 +658,11 @@ const f28 = function(right, VST, FST) {
 };
 
 const f29 = function(right, VST, FST) {
-    // <AssignStmt> -> ID = <Exprsn> ; $ 29
+
+};
+
+const f30 = function(right, VST, FST) {
+    // <AssignStmt> -> ID = <Exprsn> ; $ 30
     const A = new Node();
     const ID = deepCopy(right[0]);
     const E = deepCopy(right[2]);
@@ -642,9 +676,6 @@ const f29 = function(right, VST, FST) {
         throw new Error(errorInfo);
     }
     // 至此变量检查结束
-    
-    const newTemp1 = TA.getNewTemp(); // 指针
-    const newTemp2 = TA.getNewTemp();
     const varType = (E.valType === 'int')? 'i32': 'float';
     let storeVal;
     if(hasLetter(E.val)) {
@@ -654,16 +685,21 @@ const f29 = function(right, VST, FST) {
     }
 
     A.IR += E.IR;
-    A.IR += `%${newTemp1} = alloca ${varType}\n`;
-    A.IR += `store ${varType} ${storeVal}, ${varType}* %${newTemp1}\n`;
-    A.IR += `%${newTemp2} = load ${varType}, ${varType}* %${newTemp1}\n`;  // 此时 newTemp2 中储存着带返回值
-    A.IR += `ret ${varType} ${newTemp2}\n`; 
+    if(VST.isGlobal(ID.val)) {
+        // 对全局变量赋值不能使用普通方式
+        A.IR += `store ${varType} ${storeVal}, ${varType}* @${ID.val}\n`;
+    } else {
+        const newTemp1 = TA.getNewTemp(); // 指针
+        A.IR += `%${newTemp1} = alloca ${varType}\n`;
+        A.IR += `store ${varType} ${storeVal}, ${varType}* %${newTemp1}\n`;
+        A.IR += `%${ID.val} = load ${varType}, ${varType}* %${newTemp1}\n`;  // 此时 newTemp2 中储存着带返回值
+    }
 
     return A;
 };
 
-const f30 = function(right, VST, FST) {
-    // <ReturnStmt> -> return <Exprsn> ; $ 30
+const f31 = function(right, VST, FST) {
+    // <ReturnStmt> -> return <Exprsn> ; $ 31
     const RS = new Node();
     const E = deepCopy(right[1]);
 
@@ -679,8 +715,8 @@ const f30 = function(right, VST, FST) {
     return RS;
 };
 
-const f31 = function(right, VST, FST) {
-    // <ReturnStmt> -> return ; $ 31
+const f32 = function(right, VST, FST) {
+    // <ReturnStmt> -> return ; $ 32
     const RS = new Node();
 
     RS.returnType = 'void';
@@ -689,8 +725,8 @@ const f31 = function(right, VST, FST) {
     return RS;
 };
 
-const f32 = function(right, VST, FST) {
-    // <WhileStmt> -> while ( <Exprsn> ) <StmtBlock> $ 32
+const f33 = function(right, VST, FST) {
+    // <WhileStmt> -> while ( <Exprsn> ) <StmtBlock> $ 33
     const WS = new Node();
     const E = deepCopy(right[2]);
     const SB = deepCopy(right[4]);
@@ -719,8 +755,8 @@ const f32 = function(right, VST, FST) {
     return WS;
 };
 
-const f33 = function(right, VST, FST) {
-    // <IfStmt> -> if ( <Exprsn> ) <StmtBlock> else <StmtBlock> $ 33
+const f34 = function(right, VST, FST) {
+    // <IfStmt> -> if ( <Exprsn> ) <StmtBlock> else <StmtBlock> $ 34
     const IS = new Node();
     const E = deepCopy(right[2]);
     const SB1 = deepCopy(right[4]);
@@ -755,8 +791,8 @@ const f33 = function(right, VST, FST) {
     return IS;
 };
 
-const f34 = function(right, VST, FST) {
-    // <IfStmt> -> if ( <Exprsn> ) <StmtBlock> $ 34
+const f35 = function(right, VST, FST) {
+    // <IfStmt> -> if ( <Exprsn> ) <StmtBlock> $ 35
     const IS = new Node();
     const E = deepCopy(right[2]);
     const SB = deepCopy(right[4]);
@@ -787,8 +823,8 @@ const f34 = function(right, VST, FST) {
     return IS;
 };
 
-const f35 = function(right, VST, FST) {
-    // <Exprsn> -> <AddExprsn> $ 35
+const f36 = function(right, VST, FST) {
+    // <Exprsn> -> <AddExprsn> $ 36
     const E = new Node();
     const A = deepCopy(right[0]);
 
@@ -799,8 +835,8 @@ const f35 = function(right, VST, FST) {
     return E;
 };
 
-const f36 = function(right, VST, FST) {
-    // <Exprsn> -> <AddExprsn> < <Exprsn> $ 36
+const f37 = function(right, VST, FST) {
+    // <Exprsn> -> <AddExprsn> < <Exprsn> $ 37
     const E1 = new Node();
     const A = deepCopy(right[0]);
     const E2 = deepCopy(right[2]);
@@ -824,17 +860,17 @@ const f36 = function(right, VST, FST) {
     const opName = (A.valType === 'int')? 'icmp slt': 'fcmp olt';
     let opr1, opr2;
     if(A.valType === 'int') {
-        opr1 = 'i32 ' + ((hasLetter(I.val))? `%${F.val}`: F.val);
-        opr2 = (hasLetter(A2.val))? `%${I2.val}`: I2.val;
+        opr1 = 'i32 ' + ((hasLetter(A.val))? `%${A.val}`: A.val);
+        opr2 = (hasLetter(E2.val))? `%${E2.val}`: E2.val;
     } else {
-        opr1 = 'float ' + ((hasLetter(I.val))? `%${F.val}`: representFloat(F.val));
-        opr2 = (hasLetter(A2.val))? `%${I2.val}`: representFloat(I2.val);
+        opr1 = 'float ' + ((hasLetter(A.val))? `%${A.val}`: representFloat(A.val));
+        opr2 = (hasLetter(E2.val))? `%${E2.val}`: representFloat(E2.val);
     }
     
     E1.IR += A.IR;
     E1.IR += E2.IR;
     E1.IR += `%${newTemp1} = ${opName} ${opr1}, ${opr2}\n`;
-    E1.IR += `%${newTemp2} = alloca i32`; // 得到一个 i32 类型的指针
+    E1.IR += `%${newTemp2} = alloca i32\n`; // 得到一个 i32 类型的指针
     E1.IR += `br i1 %${newTemp1}, label %${newLabel1}, label %${newLabel2}\n`;
     E1.IR += `${newLabel1}:\n`;
     E1.IR += `store i32 1, i32* %${newTemp2}\n`; // 结果为 1
@@ -847,8 +883,8 @@ const f36 = function(right, VST, FST) {
     return E1;
 };
 
-const f37 = function(right, VST, FST) {
-    // <Exprsn> -> <AddExprsn> <= <Exprsn> $ 37
+const f38 = function(right, VST, FST) {
+    // <Exprsn> -> <AddExprsn> <= <Exprsn> $ 38
     const E1 = new Node();
     const A = deepCopy(right[0]);
     const E2 = deepCopy(right[2]);
@@ -872,17 +908,17 @@ const f37 = function(right, VST, FST) {
     const opName = (A.valType === 'int')? 'icmp sle': 'fcmp ole';
     let opr1, opr2;
     if(A.valType === 'int') {
-        opr1 = 'i32 ' + ((hasLetter(I.val))? `%${F.val}`: F.val);
-        opr2 = (hasLetter(A2.val))? `%${I2.val}`: I2.val;
+        opr1 = 'i32 ' + ((hasLetter(A.val))? `%${A.val}`: A.val);
+        opr2 = (hasLetter(E2.val))? `%${E2.val}`: E2.val;
     } else {
-        opr1 = 'float ' + ((hasLetter(I.val))? `%${F.val}`: representFloat(F.val));
-        opr2 = (hasLetter(A2.val))? `%${I2.val}`: representFloat(I2.val);
+        opr1 = 'float ' + ((hasLetter(A.val))? `%${A.val}`: representFloat(A.val));
+        opr2 = (hasLetter(E2.val))? `%${E2.val}`: representFloat(E2.val);
     }
     
     E1.IR += A.IR;
     E1.IR += E2.IR;
     E1.IR += `%${newTemp1} = ${opName} ${opr1}, ${opr2}\n`;
-    E1.IR += `%${newTemp2} = alloca i32`; // 得到一个 i32 类型的指针
+    E1.IR += `%${newTemp2} = alloca i32\n`; // 得到一个 i32 类型的指针
     E1.IR += `br i1 %${newTemp1}, label %${newLabel1}, label %${newLabel2}\n`;
     E1.IR += `${newLabel1}:\n`;
     E1.IR += `store i32 1, i32* %${newTemp2}\n`; // 结果为 1
@@ -895,8 +931,8 @@ const f37 = function(right, VST, FST) {
     return E1;
 };
 
-const f38 = function(right, VST, FST) {
-    // <Exprsn> -> <AddExprsn> > <Exprsn> $ 38
+const f39 = function(right, VST, FST) {
+    // <Exprsn> -> <AddExprsn> > <Exprsn> $ 39
     const E1 = new Node();
     const A = deepCopy(right[0]);
     const E2 = deepCopy(right[2]);
@@ -920,17 +956,17 @@ const f38 = function(right, VST, FST) {
     const opName = (A.valType === 'int')? 'icmp sgt': 'fcmp ogt';
     let opr1, opr2;
     if(A.valType === 'int') {
-        opr1 = 'i32 ' + ((hasLetter(I.val))? `%${F.val}`: F.val);
-        opr2 = (hasLetter(A2.val))? `%${I2.val}`: I2.val;
+        opr1 = 'i32 ' + ((hasLetter(A.val))? `%${A.val}`: A.val);
+        opr2 = (hasLetter(E2.val))? `%${E2.val}`: E2.val;
     } else {
-        opr1 = 'float ' + ((hasLetter(I.val))? `%${F.val}`: representFloat(F.val));
-        opr2 = (hasLetter(A2.val))? `%${I2.val}`: representFloat(I2.val);
+        opr1 = 'float ' + ((hasLetter(A.val))? `%${A.val}`: representFloat(A.val));
+        opr2 = (hasLetter(E2.val))? `%${E2.val}`: representFloat(E2.val);
     }
     
     E1.IR += A.IR;
     E1.IR += E2.IR;
     E1.IR += `%${newTemp1} = ${opName} ${opr1}, ${opr2}\n`;
-    E1.IR += `%${newTemp2} = alloca i32`; // 得到一个 i32 类型的指针
+    E1.IR += `%${newTemp2} = alloca i32\n`; // 得到一个 i32 类型的指针
     E1.IR += `br i1 %${newTemp1}, label %${newLabel1}, label %${newLabel2}\n`;
     E1.IR += `${newLabel1}:\n`;
     E1.IR += `store i32 1, i32* %${newTemp2}\n`; // 结果为 1
@@ -943,8 +979,8 @@ const f38 = function(right, VST, FST) {
     return E1;
 };
 
-const f39 = function(right, VST, FST) {
-    // <Exprsn> -> <AddExprsn> >= <Exprsn> $ 39
+const f40 = function(right, VST, FST) {
+    // <Exprsn> -> <AddExprsn> >= <Exprsn> $ 40
     const E1 = new Node();
     const A = deepCopy(right[0]);
     const E2 = deepCopy(right[2]);
@@ -968,17 +1004,17 @@ const f39 = function(right, VST, FST) {
     const opName = (A.valType === 'int')? 'icmp sge': 'fcmp oge';
     let opr1, opr2;
     if(A.valType === 'int') {
-        opr1 = 'i32 ' + ((hasLetter(I.val))? `%${F.val}`: F.val);
-        opr2 = (hasLetter(A2.val))? `%${I2.val}`: I2.val;
+        opr1 = 'i32 ' + ((hasLetter(A.val))? `%${A.val}`: A.val);
+        opr2 = (hasLetter(E2.val))? `%${E2.val}`: E2.val;
     } else {
-        opr1 = 'float ' + ((hasLetter(I.val))? `%${F.val}`: representFloat(F.val));
-        opr2 = (hasLetter(A2.val))? `%${I2.val}`: representFloat(I2.val);
+        opr1 = 'float ' + ((hasLetter(A.val))? `%${A.val}`: representFloat(A.val));
+        opr2 = (hasLetter(E2.val))? `%${E2.val}`: representFloat(E2.val);
     }
     
     E1.IR += A.IR;
     E1.IR += E2.IR;
     E1.IR += `%${newTemp1} = ${opName} ${opr1}, ${opr2}\n`;
-    E1.IR += `%${newTemp2} = alloca i32`; // 得到一个 i32 类型的指针
+    E1.IR += `%${newTemp2} = alloca i32\n`; // 得到一个 i32 类型的指针
     E1.IR += `br i1 %${newTemp1}, label %${newLabel1}, label %${newLabel2}\n`;
     E1.IR += `${newLabel1}:\n`;
     E1.IR += `store i32 1, i32* %${newTemp2}\n`; // 结果为 1
@@ -991,8 +1027,8 @@ const f39 = function(right, VST, FST) {
     return E1;
 };
 
-const f40 = function(right, VST, FST) {
-    // <Exprsn> -> <AddExprsn> == <Exprsn> $ 40
+const f41 = function(right, VST, FST) {
+    // <Exprsn> -> <AddExprsn> == <Exprsn> $ 41
     const E1 = new Node();
     const A = deepCopy(right[0]);
     const E2 = deepCopy(right[2]);
@@ -1016,17 +1052,17 @@ const f40 = function(right, VST, FST) {
     const opName = (A.valType === 'int')? 'icmp eq': 'fcmp oeq';
     let opr1, opr2;
     if(A.valType === 'int') {
-        opr1 = 'i32 ' + ((hasLetter(I.val))? `%${F.val}`: F.val);
-        opr2 = (hasLetter(A2.val))? `%${I2.val}`: I2.val;
+        opr1 = 'i32 ' + ((hasLetter(A.val))? `%${A.val}`: A.val);
+        opr2 = (hasLetter(E2.val))? `%${E2.val}`: E2.val;
     } else {
-        opr1 = 'float ' + ((hasLetter(I.val))? `%${F.val}`: representFloat(F.val));
-        opr2 = (hasLetter(A2.val))? `%${I2.val}`: representFloat(I2.val);
+        opr1 = 'float ' + ((hasLetter(A.val))? `%${A.val}`: representFloat(A.val));
+        opr2 = (hasLetter(E2.val))? `%${E2.val}`: representFloat(E2.val);
     }
     
     E1.IR += A.IR;
     E1.IR += E2.IR;
     E1.IR += `%${newTemp1} = ${opName} ${opr1}, ${opr2}\n`;
-    E1.IR += `%${newTemp2} = alloca i32`; // 得到一个 i32 类型的指针
+    E1.IR += `%${newTemp2} = alloca i32\n`; // 得到一个 i32 类型的指针
     E1.IR += `br i1 %${newTemp1}, label %${newLabel1}, label %${newLabel2}\n`;
     E1.IR += `${newLabel1}:\n`;
     E1.IR += `store i32 1, i32* %${newTemp2}\n`; // 结果为 1
@@ -1039,8 +1075,8 @@ const f40 = function(right, VST, FST) {
     return E1;
 };
 
-const f41 = function(right, VST, FST) {
-    // <Exprsn> -> <AddExprsn> != <Exprsn> $ 41
+const f42 = function(right, VST, FST) {
+    // <Exprsn> -> <AddExprsn> != <Exprsn> $ 42
     const E1 = new Node();
     const A = deepCopy(right[0]);
     const E2 = deepCopy(right[2]);
@@ -1064,17 +1100,17 @@ const f41 = function(right, VST, FST) {
     const opName = (A.valType === 'int')? 'icmp ne': 'fcmp une';
     let opr1, opr2;
     if(A.valType === 'int') {
-        opr1 = 'i32 ' + ((hasLetter(I.val))? `%${F.val}`: F.val);
-        opr2 = (hasLetter(A2.val))? `%${I2.val}`: I2.val;
+        opr1 = 'i32 ' + ((hasLetter(A.val))? `%${A.val}`: A.val);
+        opr2 = (hasLetter(E2.val))? `%${E2.val}`: E2.val;
     } else {
-        opr1 = 'float ' + ((hasLetter(I.val))? `%${F.val}`: representFloat(F.val));
-        opr2 = (hasLetter(A2.val))? `%${I2.val}`: representFloat(I2.val);
+        opr1 = 'float ' + ((hasLetter(A.val))? `%${A.val}`: representFloat(A.val));
+        opr2 = (hasLetter(E2.val))? `%${E2.val}`: representFloat(E2.val);
     }
     
     E1.IR += A.IR;
     E1.IR += E2.IR;
     E1.IR += `%${newTemp1} = ${opName} ${opr1}, ${opr2}\n`;
-    E1.IR += `%${newTemp2} = alloca i32`; // 得到一个 i32 类型的指针
+    E1.IR += `%${newTemp2} = alloca i32\n`; // 得到一个 i32 类型的指针
     E1.IR += `br i1 %${newTemp1}, label %${newLabel1}, label %${newLabel2}\n`;
     E1.IR += `${newLabel1}:\n`;
     E1.IR += `store i32 1, i32* %${newTemp2}\n`; // 结果为 1
@@ -1087,8 +1123,8 @@ const f41 = function(right, VST, FST) {
     return E1;
 };
 
-const f42 = function(right, VST, FST) {
-    // <AddExprsn> -> <Item> + <AddExprsn> $ 42
+const f43 = function(right, VST, FST) {
+    // <AddExprsn> -> <Item> + <AddExprsn> $ 43
     const A1 = new Node();
     const I = deepCopy(right[0]);
     const A2 = deepCopy(right[2]);
@@ -1124,8 +1160,8 @@ const f42 = function(right, VST, FST) {
     return A1;
 };
 
-const f43 = function(right, VST, FST) {
-    // <AddExprsn> -> <Item> - <AddExprsn> $ 43
+const f44 = function(right, VST, FST) {
+    // <AddExprsn> -> <Item> - <AddExprsn> $ 44
     const A1 = new Node();
     const I = deepCopy(right[0]);
     const A2 = deepCopy(right[2]);
@@ -1161,8 +1197,8 @@ const f43 = function(right, VST, FST) {
     return A1;
 };
 
-const f44 = function(right, VST, FST) {
-    // <AddExprsn> -> <Item> $ 44
+const f45 = function(right, VST, FST) {
+    // <AddExprsn> -> <Item> $ 45
     const A = new Node();
     const I = deepCopy(right[0]);
 
@@ -1173,8 +1209,8 @@ const f44 = function(right, VST, FST) {
     return A;
 };
 
-const f45 = function(right, VST, FST) {
-    // <Item> -> <Factor> * <Item> $ 45
+const f46 = function(right, VST, FST) {
+    // <Item> -> <Factor> * <Item> $ 46
     const I1 = new Node();
     const F = deepCopy(right[0]);
     const I2 = deepCopy(right[2]);
@@ -1211,8 +1247,8 @@ const f45 = function(right, VST, FST) {
     return I1;
 };
 
-const f46 = function(right, VST, FST) {
-    // <Item> -> <Factor> / <Item> $ 46
+const f47 = function(right, VST, FST) {
+    // <Item> -> <Factor> / <Item> $ 47
     const I1 = new Node();
     const F = deepCopy(right[0]);
     const I2 = deepCopy(right[2]);
@@ -1248,8 +1284,8 @@ const f46 = function(right, VST, FST) {
     return I1;
 };
 
-const f47 = function(right, VST, FST) {
-    // <Item> -> <Factor> $ 47
+const f48 = function(right, VST, FST) {
+    // <Item> -> <Factor> $ 48
     const I = new Node();
     const F = deepCopy(right[0]);
 
@@ -1260,8 +1296,8 @@ const f47 = function(right, VST, FST) {
     return I;
 };
 
-const f48 = function(right, VST, FST) {
-    // <Factor> -> inum $ 48
+const f49 = function(right, VST, FST) {
+    // <Factor> -> inum $ 49
     const F = new Node();
     const inum = deepCopy(right[0]);
 
@@ -1271,8 +1307,8 @@ const f48 = function(right, VST, FST) {
     return F;
 };
 
-const f49 = function(right, VST, FST) {
-    // <Factor> -> fnum $ 49
+const f50 = function(right, VST, FST) {
+    // <Factor> -> fnum $ 50
     const F = new Node();
     const fnum = deepCopy(right[0]);
 
@@ -1282,8 +1318,8 @@ const f49 = function(right, VST, FST) {
     return F;
 };
 
-const f50 = function(right, VST, FST) {
-    // <Factor> -> ( <Exprsn> ) $ 50
+const f51 = function(right, VST, FST) {
+    // <Factor> -> ( <Exprsn> ) $ 51
     const F = new Node();
     const E = deepCopy(right[1]);
 
@@ -1294,8 +1330,8 @@ const f50 = function(right, VST, FST) {
     return F;
 };
 
-const f51 = function(right, VST, FST) {
-	// <Factor> -> ID $ 51
+const f52 = function(right, VST, FST) {
+	// <Factor> -> ID $ 52
     const F = new Node();
     const ID = deepCopy(right[0]);
     
@@ -1305,19 +1341,30 @@ const f51 = function(right, VST, FST) {
     }
     // 至此变量检查结束
 
-    F.val = ID.val;
-    F.valType = VST.getVarType(ID.val);
+    if(VST.isGlobal(ID.val)) {
+        const newTemp1 = TA.getNewTemp();
+        F.val = newTemp1;
+        F.valType = VST.getVarType(ID.val);
+        const varType = (F.valType === 'int')? 'i32': 'float';
+        
+        F.IR += `%${newTemp1} = load ${varType}, ${varType}* @${ID.val}\n`;
+    } else {
+        F.val = ID.val;
+        F.valType = VST.getVarType(ID.val);
+    }
 
     return F;
 };
 
-const f52 = function(right, VST, FST) {
-	// <Factor> -> ID <FuncCall> $ 52
+const f53 = function(right, VST, FST) {
+	// <Factor> -> ID <FuncCall> $ 53
 	const F = new Node();
 	const ID = deepCopy(right[0]);
 	const FC = deepCopy(right[1]);
 
 	if(!FST.hasFunc(ID.val, FC.argType)) {
+        console.log(ID.val);
+        console.log(FC.argType);
         const errorInfo = 'Function parameter type don\'t match';
         throw new Error(errorInfo);
     }
@@ -1354,8 +1401,8 @@ const f52 = function(right, VST, FST) {
     return F;
 };
 
-const f53 = function(right, VST, FST) {
-	// <FuncCall> -> ( <ActualArgs> ) $ 53
+const f54 = function(right, VST, FST) {
+	// <FuncCall> -> ( <ActualArgs> ) $ 54
 	const F = new Node();
 	const Ac = deepCopy(right[1]);
 
@@ -1366,8 +1413,8 @@ const f53 = function(right, VST, FST) {
 	return F;
 };
 
-const f54 = function(right, VST, FST) {
-	// <ActualArgs> -> <ArgList> $ 54
+const f55 = function(right, VST, FST) {
+	// <ActualArgs> -> <ArgList> $ 55
 	const Ac = new Node();
 	const Arg = deepCopy(right[0]);
 
@@ -1378,8 +1425,8 @@ const f54 = function(right, VST, FST) {
 	return Ac;
 };
 
-const f55 = function(right, VST, FST) {
-	// <ActualArgs> -> void $ 55
+const f56 = function(right, VST, FST) {
+	// <ActualArgs> -> void $ 56
 	const A = new Node();
 	
 	A.args = new Array();
@@ -1388,8 +1435,8 @@ const f55 = function(right, VST, FST) {
 	return A;
 };
 
-const f56 = function(right, VST, FST) {
-	// <ActualArgs> -> ε $ 56
+const f57 = function(right, VST, FST) {
+	// <ActualArgs> -> ε $ 57
 	const A = new Node();
 
 	A.args = new Array();
@@ -1398,8 +1445,8 @@ const f56 = function(right, VST, FST) {
 	return A;
 };
 
-const f57 = function(right, VST, FST) {
-	// <ArgList> -> <Exprsn> , <ArgList> $ 57
+const f58 = function(right, VST, FST) {
+	// <ArgList> -> <Exprsn> , <ArgList> $ 58
 	const A1 = new Node();
 	const E = deepCopy(right[0]);
 	const A2 = deepCopy(right[2]);
@@ -1413,8 +1460,8 @@ const f57 = function(right, VST, FST) {
 	return A1;
 };
 
-const f58 = function(right, VST, FST) {
-    // <ArgList> -> <Exprsn> $ 58
+const f59 = function(right, VST, FST) {
+    // <ArgList> -> <Exprsn> $ 59
 	const A = new Node();
 	const E = deepCopy(right[0]);
 
@@ -1492,7 +1539,7 @@ class IR_Generator {
  * @private
  */
 IR_Generator.prototype._initialize = function() {
-    for(let i = 1; i <= 58; i++) {
+    for(let i = 1; i <= 59; i++) {
         const code = `this._allFuncs[${i}] = f${i};`;
         eval(code); // 执行上述代码
     }

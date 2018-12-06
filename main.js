@@ -10,8 +10,7 @@ P.initialize();
 
 
 I.readProdNoFile();
-// I._prodNo['<FuncDecl> float ID ( <FormalParams> ) <StmtBlock>'] = 13;
-// console.log(I._prodNo);
+console.log(I._prodNo)
 
 console.log(`LR0: ${P.isLR0()}`);
 console.log();

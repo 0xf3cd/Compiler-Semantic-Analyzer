@@ -1,12 +1,21 @@
-
 int b = 20;
 int c = 2;
 
-void main(int cc) {
-    int aa = 1;
-    if(aa + cc) {
-        return;
+/*
+void printi(int x) {
+    return;
+}
+
+int readi() {
+    return b;
+}
+*/
+
+int main(int cc) {
+    int bb = 9 * b + c;
+    if(bb) {
+        int x = 13;
     }
-    
+    return bb;
 }
 #
