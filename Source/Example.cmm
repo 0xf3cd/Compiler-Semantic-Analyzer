@@ -1,27 +1,16 @@
 int b = 20;
 int c = 2;
 
-void writei(int x) {
-    return;
-}
-
-int readi() {
-    return b;
-}
-
 int main() {
-    int bb = 9 * b + c;
-    if(bb) {
-        bb = bb + 1;
-        return bb;
-    } else {
-        int cc = bb + 13 * readi();
-        while(cc <= 100) {
-            cc = cc + 2;
-        }
-        return cc;
-    }
-    writei(bb);
-    return 14;
+    writei(b);
+    writef(itof(c));
+
+    int useri = readi();
+    float userf = readf();
+
+    writei(useri);
+    writef(userf);
+
+    return 0;
 }
 #

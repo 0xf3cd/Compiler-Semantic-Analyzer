@@ -1272,7 +1272,6 @@ const f46 = function(right, VST, FST) {
     const F = deepCopy(right[0]);
     const I2 = deepCopy(right[2]);
 
-    console.log(F);
     if(F.valType !== I2.valType) {
         const errorInfo = 'Two operands have different type';
         throw new Error(errorInfo);
@@ -1417,9 +1416,12 @@ const f53 = function(right, VST, FST) {
 	const ID = deepCopy(right[0]);
 	const FC = deepCopy(right[1]);
 
+    if(FST.getReturnType(ID.val) === null) {
+        // console.log(ID.val)
+        const errorInfo = 'Function called didn\'t be declared';
+        throw new Error(errorInfo);
+    }
 	if(!FST.hasFunc(ID.val, FC.argType)) {
-        console.log(ID.val);
-        console.log(FC.argType);
         const errorInfo = 'Function parameter type don\'t match';
         throw new Error(errorInfo);
     }
@@ -1542,6 +1544,13 @@ class IR_Generator {
         this._filePath = './Grammar/Production-No.txt';
 
         /**
+         * 生成中间代码的存放地址
+         * @private
+         * @type {string}
+         */
+        this._IR_Path = './IR/IR.ll';
+
+        /**
          * 产生式编号表
          * 通过读取文件获取
          * @private
@@ -1585,6 +1594,20 @@ class IR_Generator {
          */
         this._allFuncs = new Map();
 
+        /**
+         * 储存中间代码的头部（其中有库函数）
+         * @private
+         * @type {string}
+         */
+        this._IR_Head = null;
+
+        /**
+         * 储存的中间代码（分析完成后自动储存）
+         * @private
+         * @type {string}
+         */
+        this._IR_Code = null;
+
         this._initialize();
     }
 }
@@ -1598,6 +1621,20 @@ IR_Generator.prototype._initialize = function() {
         const code = `this._allFuncs[${i}] = f${i};`;
         eval(code); // 执行上述代码
     }
+
+    const headContent = fs.readFileSync(__dirname + '/IR/head.ll').toString();
+    this._IR_Head = headContent;
+    // console.log(this._IR_Head);
+
+    // 向符号表和函数表中预先存入库函数和需要的全局变量
+    this._varTable.append('inputf', 'float');
+    this._varTable.append('inputi', 'int');
+    this._funcTable.append('readf', 'float', [], []);
+    this._funcTable.append('writef', 'void', ['float'], ['itDoesntMatter']);
+    this._funcTable.append('readi', 'int', [], []);
+    this._funcTable.append('writei', 'void', ['int'], ['itDoesntMatter']);
+    this._funcTable.append('itof', 'float', ['int'], ['itDoesntMatter']);
+    this._funcTable.append('ftoi', 'int', ['float'], ['itDoesntMatter']);
 };
 
 /**
@@ -1618,10 +1655,11 @@ IR_Generator.prototype._getFunc = function(record) {
     const pNo = this._prodNo[key];
     const f = this._allFuncs[pNo];
 
-    // console.log(f);
     return f;
 };
 
+
+// 以下为暴露给外部的函数
 /**
  * 设置文件地址
  * @public
@@ -1629,6 +1667,15 @@ IR_Generator.prototype._getFunc = function(record) {
  */
 IR_Generator.prototype.setFilePath = function(newFilePath) {
     this._filePath = newFilePath;
+};
+
+/**
+ * 设置生成的中间代码的地址
+ * @public
+ * @param {string} newIRPath
+ */
+IR_Generator.prototype.setIRPath = function(newIRPath) {
+    this._IR_Path = newIRPath;
 };
 
 /**
@@ -1653,7 +1700,6 @@ IR_Generator.prototype.readProdNoFile = function() {
         this._prodNo[`${left} ${right}`] = parseInt(no); // 将产生式左部和右部接合作为键，编号作为值，加入 map 中
     }
 
-    // console.log(this._prodNo);
     this._fileReadFinish = true;
 };
 
@@ -1664,17 +1710,13 @@ IR_Generator.prototype.readProdNoFile = function() {
  */
 IR_Generator.prototype.analyze = function(record) {
     if(record.parseResult[0] === 's') {
-        console.log('line: ' + record.lineNum + 'shift in\n');
-        console.log(record.symbolStack + '\n');
+        console.log('shift in: ' + record.tokenValue);
         const N = new Node();
         N.name = record.symbolName;
         N.val = record.tokenValue;
         this._topNodes.push(N);
     } else if(record.parseResult[0] === 'r') {
-        console.log('line: ' + record.lineNum + 'reduce');
-        console.log(record.productionLeft + ' -> ' + record.productionRight);
-        console.log(record.symbolStack);
-        console.log(record.stateStack);
+        console.log('reduce: ' + record.productionLeft + ' -> ' + record.productionRight);
         const f = this._getFunc(record); // 得到语义分析函数
 
         const rightNodes = new Array();
@@ -1692,16 +1734,26 @@ IR_Generator.prototype.analyze = function(record) {
 
         const leftNode = f(rightNodes, this._varTable, this._funcTable);
         leftNode.name = record.productionLeft;
-        console.log(leftNode);
-        console.log();
         this._topNodes.push(leftNode);
     } else if(record.parseResult === 'acc') {
         console.log('acc');
-        console.log(this._topNodes[0].IR);
+        this._IR_Code = this._topNodes[0].IR;
     } else if(record.parseResult === 'error') {
         console.log('error');
+        const errorInfo = 'Source file syntax error';
+        throw new Error(errorInfo);
     } else {
+        const errorInfo = 'Unknown error, please fix me!';
+        throw new Error(errorInfo);
     }
+};
+
+/**
+ * 输出分析后的中间代码
+ * @public
+ */
+IR_Generator.prototype.outputIR = function() {
+    fs.writeFileSync(this._IR_Path, this._IR_Head + this._IR_Code);
 };
 
 

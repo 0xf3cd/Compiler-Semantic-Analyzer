@@ -1,5 +1,12 @@
 # Compiler-Semantic-Analyzer
 
+## First of All
+
+- 结合 `LLVM` 已经可以生成可执行文件（Mac 上）
+- 在不修改代码的情况下，执行 `node main.js` 可以生成 `./Source/Example.cmm` 对应的中间代码，中间代码存放在 `./IR/IR.ll` 中
+- 进入中间代码所在目录后，直接执行 `clang -o test LR.ll` 可以得到可执行文件 `test`
+- 用 `C` 语言为大作业所用语言写了简单的输入输出函数以及类型转换函数
+
 ## 说明
 
 - 项目基于先前 LR 分析方法的语法分析器，增加了 `float` 类型的数据，同时调整了文法，使得文法更为简洁
@@ -71,9 +78,11 @@
 3.  ~~调整文法，进行语义动作设计~~ 具体文法和终结符可以参见 `./Assignments/*.pdf`
 4.  ~~进行语义分析（包括类型检查等） ~~
 5.  ~~生成中间代码~~
-6.  修正综合属性、测试
-7.  开发图形界面 with `HTML，CSS，JavaScript`
-8.  利用 `Electron` 打包成为桌面应用，`Electron` 可以理解成 `Node.js` 中的一个库（和 `ffi` 一样是库）
+6.  ~~修正综合属性、测试~~
+7.  编写将浮点数字面量转换成 `LLVM` 支持形式的函数
+8.  调整中间代码输出形式，使其更美观
+9.  开发图形界面 with `HTML，CSS，JavaScript`
+10.  利用 `Electron` 打包成为桌面应用，`Electron` 可以理解成 `Node.js` 中的一个库（和 `ffi` 一样是库）
 
 
 ## 变元表
