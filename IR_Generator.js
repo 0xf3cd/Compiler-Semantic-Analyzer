@@ -191,6 +191,28 @@ const f5 = function(right, VST, FST) {
     const VD = deepCopy(right[0]);
 
     D.IR = VD.IR;
+    const allIR = D.IR.split('\n');
+    allIR.pop(); // 除去最后的空字符串
+    const l3 = allIR.pop();
+    const l2 = allIR.pop();
+    const l1 = allIR.pop(); // 得到末尾三句中间代码，即局部性的变量申明和赋值语句
+
+    const varValue = l2.split(' ')[2].split(',')[0]; // 按照语法规范，这一部分是变量的值，语法规定这一部分只能是常数（全局变量必须为常数）
+    if(hasLetter(varValue) === NaN) { // 说明全局变量不为常数
+        const errorInfo = `Global var must be declared as constant, ${varValue} is valid`;
+        throw new Error(errorInfo);
+    }
+    // 否则说明声明时指定为常数了
+    const varName = l3.split(' ')[0].split('%')[1]; // 操作中间代码可以得到变量名（没有利用继承属性传上了）
+    const varType = VST.getVarType(varName);
+    VST.setGlobal(varName); // 将变量设为全局的
+    allIR.push(`@${varName} = global ${varType === 'int'? 'i32': 'float'} ${varValue}`);
+    //至此，成功将局部变量提升为全局变量，并修改其中间代码形式为符合 LLVM 的形式
+    
+    D.IR = ''; //中间代码清零
+    for(let each of allIR) {
+        D.IR += each.toString() + '\n';
+    }
 
     return D;
 };
@@ -209,6 +231,15 @@ const f7 = function(right, VST, FST) {
     // <VarDecl> -> int ID ; $ 7
     const VD = new Node();
     const ID = deepCopy(right[1]);
+
+    if(VST.hasVar(ID.val)) {
+        const errorInfo = 'Another var that has the same name declared';
+        throw new Error(errorInfo);
+    }
+    if(FST.getReturnType(ID.val) !== null) {
+        const errorInfo = 'A function that has the same name declared';
+        throw new Error(errorInfo);
+    }
 
     VST.append(ID.val, 'int');
 
@@ -231,6 +262,14 @@ const f8 = function(right, VST, FST) {
 
     if(E.valType !== 'int') {
         const errorInfo = 'Assign a value of float to a var of int';
+        throw new Error(errorInfo);
+    }
+    if(VST.hasVar(ID.val)) {
+        const errorInfo = 'Another var that has the same name declared';
+        throw new Error(errorInfo);
+    }
+    if(FST.getReturnType(ID.val) !== null) {
+        const errorInfo = 'A function that has the same name declared';
         throw new Error(errorInfo);
     }
 
@@ -258,6 +297,15 @@ const f9 = function(right, VST, FST) {
     const VD = new Node();
     const ID = deepCopy(right[1]);
 
+    if(VST.hasVar(ID.val)) {
+        const errorInfo = 'Another var that has the same name declared';
+        throw new Error(errorInfo);
+    }
+    if(FST.getReturnType(ID.val) !== null) {
+        const errorInfo = 'A function that has the same name declared';
+        throw new Error(errorInfo);
+    }
+
     VST.append(ID.val, 'float');
 
     const newTemp1 = TA.getNewTemp(); // 指针
@@ -279,6 +327,14 @@ const f10 = function(right, VST, FST) {
 
     if(E.valType !== 'float') {
         const errorInfo = 'Assign a value of int to a var of float';
+        throw new Error(errorInfo);
+    }
+    if(VST.hasVar(ID.val)) {
+        const errorInfo = 'Another var that has the same name declared';
+        throw new Error(errorInfo);
+    }
+    if(FST.getReturnType(ID.val) !== null) {
+        const errorInfo = 'A function that has the same name declared';
         throw new Error(errorInfo);
     }
 
@@ -307,6 +363,14 @@ const f11 = function(right, VST, FST) {
         const errorInfo = 'Return type differs from function declaration';
         throw new Error(errorInfo);
     }
+    if(VST.hasVar(ID.val)) {
+        const errorInfo = 'A var that has the same name declared';
+        throw new Error(errorInfo);
+    }
+    if(FST.getReturnType(ID.val) !== null) {
+        const errorInfo = 'Another function that has the same name declared';
+        throw new Error(errorInfo);
+    }
 
     FD.IR += `define int @${ID.val}(${FP.IR}) {\n`;
     FD.IR += SB.IR;
@@ -327,6 +391,15 @@ const f12 = function(right, VST, FST) {
         const errorInfo = 'Return type differs from function declaration';
         throw new Error(errorInfo);
     }
+    if(VST.hasVar(ID.val)) {
+        const errorInfo = 'A var that has the same name declared';
+        throw new Error(errorInfo);
+    }
+    if(FST.getReturnType(ID.val) !== null) {
+        const errorInfo = 'Another function that has the same name declared';
+        throw new Error(errorInfo);
+    }
+
     FD.IR += `define float @${ID.val}(${FP.IR}) {\n`;
     FD.IR += SB.IR;
     FD.IR += `}\n`;
@@ -346,8 +419,22 @@ const f13 = function(right, VST, FST) {
         const errorInfo = 'Return type differs from function declaration';
         throw new Error(errorInfo);
     }
+    if(VST.hasVar(ID.val)) {
+        const errorInfo = 'A var that has the same name declared';
+        throw new Error(errorInfo);
+    }
+    if(FST.getReturnType(ID.val) !== null) {
+        const errorInfo = 'Another function that has the same name declared';
+        throw new Error(errorInfo);
+    }
+
     FD.IR += `define void @${ID.val}(${FP.IR}) {\n`;
     FD.IR += SB.IR;
+    
+    if(FD.IR.slice(-9) !== 'ret void\n') {
+        FD.IR += 'ret void\n';
+    }
+
     FD.IR += `}\n`;
     FST.append(ID.val, 'void', FP.paramType, FP.paramName);
 
@@ -411,9 +498,14 @@ const f19 = function(right, VST, FST) {
     const P = new Node();
     const ID = deepCopy(right[1]);
 
+    if(VST.isGlobal(ID.val) === true) {
+        const errorInfo = `Parameter name is the same as global var ${ID.val}`;
+        throw new Error(errorInfo);
+    }
+
     P.paramType.unshift('int');
     P.paramName.unshift(ID.val);
-    P.IR = `i32 %${ID}`;
+    P.IR = `i32 %${ID.val}`;
 
     return P;
 };
@@ -423,9 +515,14 @@ const f20 = function(right, VST, FST) {
     const P = new Node();
     const ID = deepCopy(right[1]);
 
+    if(VST.isGlobal(ID.val) === true) {
+        const errorInfo = `Parameter name is the same as global var ${ID.val}`;
+        throw new Error(errorInfo);
+    }
+
     P.paramType = 'float';
     P.paramName = ID.val;
-    P.IR = `float %${ID}`;
+    P.IR = `float %${ID.val}`;
 
     return P;
 };
@@ -1011,18 +1108,18 @@ const f42 = function(right, VST, FST) {
     const opName = (A1.valType === 'int')? 'add': 'fadd';
     const oprType = (A1.valType === 'int')? 'i32': 'float';
     let opr1, opr2;
-    if(F.valType === 'int') {
+    if(I.valType === 'int') {
         opr1 = (hasLetter(I.val))? `%${I.val}`: I.val;
     } else {
         opr1 = (hasLetter(I.val))? `%${I.val}`: representFloat(I.val);
     }
-    if(I2.valType === 'int') {
+    if(A2.valType === 'int') {
         opr2 = (hasLetter(A2.val))? `%${A2.val}`: A2.val;
     } else {
         opr2 = (hasLetter(A2.val))? `%${A2.val}`: representFloat(A2.val);
     }
 
-    A1.IR += `%${newTemp} = ${opName} ${oprType} ${opr1}, ${oprType} ${opr2}\n`;
+    A1.IR += `%${newTemp} = ${opName} ${oprType} ${opr1}, ${opr2}\n`;
 
     return A1;
 };
@@ -1048,18 +1145,18 @@ const f43 = function(right, VST, FST) {
     const opName = (A1.valType === 'int')? 'sub': 'fsub';
     const oprType = (A1.valType === 'int')? 'i32': 'float';
     let opr1, opr2;
-    if(F.valType === 'int') {
+    if(I.valType === 'int') {
         opr1 = (hasLetter(I.val))? `%${I.val}`: I.val;
     } else {
         opr1 = (hasLetter(I.val))? `%${I.val}`: representFloat(I.val);
     }
-    if(I2.valType === 'int') {
+    if(A2.valType === 'int') {
         opr2 = (hasLetter(A2.val))? `%${A2.val}`: A2.val;
     } else {
         opr2 = (hasLetter(A2.val))? `%${A2.val}`: representFloat(A2.val);
     }
 
-    A1.IR += `%${newTemp} = ${opName} ${oprType} ${opr1}, ${oprType} ${opr2}\n`;
+    A1.IR += `%${newTemp} = ${opName} ${oprType} ${opr1}, ${opr2}\n`;
 
     return A1;
 };
@@ -1082,6 +1179,7 @@ const f45 = function(right, VST, FST) {
     const F = deepCopy(right[0]);
     const I2 = deepCopy(right[2]);
 
+    console.log(F);
     if(F.valType !== I2.valType) {
         const errorInfo = 'Two operands have different type';
         throw new Error(errorInfo);
@@ -1108,7 +1206,7 @@ const f45 = function(right, VST, FST) {
         opr2 = (hasLetter(I2.val))? `%${I2.val}`: representFloat(I2.val);
     }
 
-    I1.IR += `%${newTemp} = ${opName} ${oprType} ${opr1}, ${oprType} ${opr2}\n`;
+    I1.IR += `%${newTemp} = ${opName} ${oprType} ${opr1}, ${opr2}\n`;
 
     return I1;
 };
@@ -1145,7 +1243,7 @@ const f46 = function(right, VST, FST) {
         opr2 = (hasLetter(I2.val))? `%${I2.val}`: representFloat(I2.val);
     }
 
-    I1.IR += `%${newTemp} = ${opName} ${oprType} ${opr1}, ${oprType} ${opr2}\n`;
+    I1.IR += `%${newTemp} = ${opName} ${oprType} ${opr1}, ${opr2}\n`;
 
     return I1;
 };
@@ -1465,17 +1563,25 @@ IR_Generator.prototype.readProdNoFile = function() {
 IR_Generator.prototype.analyze = function(record) {
     if(record.parseResult[0] === 's') {
         console.log('line: ' + record.lineNum + 'shift in\n');
+        console.log(record.symbolStack + '\n');
         const N = new Node();
         N.name = record.symbolName;
         N.val = record.tokenValue;
         this._topNodes.push(N);
     } else if(record.parseResult[0] === 'r') {
         console.log('line: ' + record.lineNum + 'reduce');
-        console.log(record.productionLeft + ' -> ' + record.productionRight)
+        console.log(record.productionLeft + ' -> ' + record.productionRight);
+        console.log(record.symbolStack);
+        console.log(record.stateStack);
         const f = this._getFunc(record); // 得到语义分析函数
 
         const rightNodes = new Array();
-        const rightAmount = record.productionRight.length; //产生式右部的符号个数
+        let rightAmount; //产生式右部的符号个数
+        if(record.productionRight.length === 1 && record.productionRight[0] === 'ε') {
+            rightAmount = 0;
+        } else {
+            rightAmount = record.productionRight.length;
+        }
         for(let i = 0; i < rightAmount; i++) {
             const tN = this._topNodes.pop();
             rightNodes.unshift(tN);
@@ -1483,6 +1589,7 @@ IR_Generator.prototype.analyze = function(record) {
         // 此时得到所有待规约符号
 
         const leftNode = f(rightNodes, this._varTable, this._funcTable);
+        leftNode.name = record.productionLeft;
         console.log(leftNode);
         console.log();
         this._topNodes.push(leftNode);
@@ -1491,9 +1598,7 @@ IR_Generator.prototype.analyze = function(record) {
         console.log(this._topNodes[0].IR);
     } else if(record.parseResult === 'error') {
         console.log('error');
-
     } else {
-
     }
 };
 

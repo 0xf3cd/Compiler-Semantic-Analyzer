@@ -19,6 +19,13 @@ class VarItem {
          * @type {string}
          */
         this.varType = null;
+
+        /**
+         * 是否为全局变量
+         * @public
+         * @type {boolean}
+         */
+        this.isGlobal = false;
     }
 }
 
@@ -47,7 +54,7 @@ class VarSymbolTable {
 /**
  * 设置表名
  * @public
- * @param newName {string}
+ * @param {string} newName
  */
 VarSymbolTable.prototype.setTableName = function(newName) {
     this._tableName = newName;
@@ -65,8 +72,8 @@ VarSymbolTable.prototype.getTableName = function() {
 /**
  * 插入变量
  * @public
- * @param varName {string}
- * @param varType {string}
+ * @param {string} varName
+ * @param {string} varType
  */
 VarSymbolTable.prototype.append = function(varName, varType) {
     let newVar = new VarItem();
@@ -90,7 +97,7 @@ VarSymbolTable.prototype.remove = function() {
 /**
  * 查询是否有某名字的变量
  * @public
- * @param varName {string}
+ * @param {string} varName
  * @return {boolean} 
  */
 VarSymbolTable.prototype.hasVar = function(varName) {
@@ -105,13 +112,42 @@ VarSymbolTable.prototype.hasVar = function(varName) {
 /**
  * 查询是否有某名字的变量的类型
  * @public
- * @param varName {string}
+ * @param {string} varName
  * @return {string} 返回变量的类型，未找到返回 null
  */
 VarSymbolTable.prototype.getVarType = function(varName) {
     for(let each of this._table) {
         if(each.varName === varName) {
             return each.varType;
+        }
+    }
+    return null;
+};
+
+/**
+ * 将某个变量置为全局变量
+ * @public
+ * @param {string} varName
+ */
+VarSymbolTable.prototype.setGlobal = function(varName) {
+    for(let each of this._table) {
+        if(each.varName === varName) {
+            each.isGlobal = true;
+        }
+    }
+};
+
+/**
+ * 查询某个变量是否为全局变量
+ * 如果不存在这个变量返回 null
+ * @public
+ * @param {string} varName
+ * @return {boolean}
+ */
+VarSymbolTable.prototype.isGlobal = function(varName) {
+    for(let each of this._table) {
+        if(each.varName === varName) {
+            return each.isGlobal;
         }
     }
     return null;

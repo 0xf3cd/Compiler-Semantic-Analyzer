@@ -1,8 +1,12 @@
-float x = .3;
-float y = x * x;
-float z = 1.0;
 
-int a = 19;
 int b = 20;
-int x = 2;
+int c = 2;
+
+void main(int cc) {
+    int aa = 1;
+    if(aa + cc) {
+        return;
+    }
+    
+}
 #

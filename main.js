@@ -32,5 +32,5 @@ while(true) {
     }
 }
 
-let t = P.getParseTree();
-console.log(t); //S
+// let t = P.getParseTree();
+// console.log(t); //S
