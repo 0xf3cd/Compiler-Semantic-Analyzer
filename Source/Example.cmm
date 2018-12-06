@@ -1,16 +1,30 @@
 int b = -20;
 int c = 2;
 
+int calcSum(int s, int e) {
+    int sum = 0;
+    int i = s;
+
+    while(i <= e) {
+        sum = sum + i;
+        i = i + 1;
+    }
+
+    return sum;
+}
+
 int main() {
     writei(b);
     writef(itof(c));
 
-    int user_i = readi();
-    float user_f = readf();
-    int x = -3;
+    //int user_i = readi();
+    //float user_f = readf();
+    //int x = -3;
 
-    writei(user_i + x);
-    writef(user_f);
+    //writei(user_i + x);
+    //writef(user_f);
+
+    writei(calcSum(0, 100));
 
     return 0;
 }

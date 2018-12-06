@@ -77,25 +77,55 @@ attributes #1 = { "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-
 
 @b = global i32 -20
 @c = global i32 2
+define i32 @calcSum(i32, i32) {
+%s = alloca i32
+store i32 %0, i32* %s
+%e = alloca i32
+store i32 %1, i32* %e
+%sum = alloca i32
+store i32 0, i32* %sum
+%tmp0 = load i32, i32* %s
+%i = alloca i32
+store i32 %tmp0, i32* %i
+br label %L3
+L3:
+%tmp1 = load i32, i32* %i
+%tmp2 = load i32, i32* %e
+%tmp3 = icmp sle i32 %tmp1, %tmp2
+%tmp4 = alloca i32
+br i1 %tmp3, label %L0, label %L1
+L0:
+store i32 1, i32* %tmp4
+br label %L2
+L1:
+store i32 0, i32* %tmp4
+br label %L2
+L2:
+%tmp5 = load i32, i32* %tmp4
+br label %L4
+L4:
+%tmp11 = icmp eq i32 %tmp5, 1
+br i1 %tmp11, label %L5, label %L6
+L5:
+%tmp6 = load i32, i32* %sum
+%tmp7 = load i32, i32* %i
+%tmp8 = add i32 %tmp6, %tmp7
+store i32 %tmp8, i32* %sum
+%tmp9 = load i32, i32* %i
+%tmp10 = add i32 %tmp9, 1
+store i32 %tmp10, i32* %i
+br label %L3
+L6:
+%tmp12 = load i32, i32* %sum
+ret i32 %tmp12
+}
 define i32 @main() {
-%tmp0 = load i32, i32* @b
-call void @writei(i32 %tmp0)
-%tmp1 = load i32, i32* @c
-%tmp2 = call float @itof(i32 %tmp1)
-call void @writef(float %tmp2)
-%tmp3 = call i32 @readi()
-%user_i = alloca i32
-store i32 %tmp3, i32* %user_i
-%tmp4 = call float @readf()
-%user_f = alloca float
-store float %tmp4, float* %user_f
-%x = alloca i32
-store i32 -3, i32* %x
-%tmp5 = load i32, i32* %user_i
-%tmp6 = load i32, i32* %x
-%tmp7 = add i32 %tmp5, %tmp6
-call void @writei(i32 %tmp7)
-%tmp8 = load float, float* %user_f
-call void @writef(float %tmp8)
+%tmp13 = load i32, i32* @b
+call void @writei(i32 %tmp13)
+%tmp14 = load i32, i32* @c
+%tmp15 = call float @itof(i32 %tmp14)
+call void @writef(float %tmp15)
+%tmp16 = call i32 @calcSum(i32 0, i32 100)
+call void @writei(i32 %tmp16)
 ret i32 0
 }

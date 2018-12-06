@@ -377,6 +377,11 @@ const f11 = function(right, VST, FST) {
     }
 
     FD.IR += `define i32 @${ID.val}(${FP.IR}) {\n`;
+    for(let i = 0; i < FP.paramName.length; i++) {
+        const nowType = (FP.paramType[i] === 'int')? 'i32': 'float';
+        FD.IR += `%${FP.paramName[i]} = alloca ${nowType}\n`;
+        FD.IR += `store ${nowType} %${i}, ${nowType}* %${FP.paramName[i]}\n`;
+    }
     FD.IR += SB.IR;
     FD.IR += `}\n`;
     FST.append(ID.val, 'int', FP.paramType, FP.paramName);
@@ -409,6 +414,11 @@ const f12 = function(right, VST, FST) {
     }
 
     FD.IR += `define float @${ID.val}(${FP.IR}) {\n`;
+    for(let i = 0; i < FP.paramName.length; i++) {
+        const nowType = (FP.paramType[i] === 'int')? 'i32': 'float';
+        FD.IR += `%${FP.paramName[i]} = alloca ${nowType}\n`;
+        FD.IR += `store ${nowType} %${i}, ${nowType}* %${FP.paramName[i]}\n`;
+    }
     FD.IR += SB.IR;
     FD.IR += `}\n`;
     FST.append(ID.val, 'float', FP.paramType, FP.paramName);
@@ -441,6 +451,11 @@ const f13 = function(right, VST, FST) {
     }
 
     FD.IR += `define void @${ID.val}(${FP.IR}) {\n`;
+    for(let i = 0; i < FP.paramName.length; i++) {
+        const nowType = (FP.paramType[i] === 'int')? 'i32': 'float';
+        FD.IR += `%${FP.paramName[i]} = alloca ${nowType}\n`;
+        FD.IR += `store ${nowType} %${i}, ${nowType}* %${FP.paramName[i]}\n`;
+    }
     FD.IR += SB.IR;
     
     if(FD.IR.slice(-9) !== 'ret void\n') {
@@ -525,7 +540,7 @@ const f19 = function(right, VST, FST) {
 
     P.paramType.unshift('int');
     P.paramName.unshift(ID.val);
-    P.IR = `i32 %${ID.val}`;
+    P.IR = `i32`;
 
     return P;
 };
@@ -542,7 +557,7 @@ const f20 = function(right, VST, FST) {
 
     P.paramType = 'float';
     P.paramName = ID.val;
-    P.IR = `float %${ID.val}`;
+    P.IR = `float`;
 
     return P;
 };
@@ -781,10 +796,13 @@ const f33 = function(right, VST, FST) {
     WS.returnType = SB.returnType;   
     
     const newTemp1 = TA.getNewTemp(); // i1 
+    const newLabel0 = LA.getNewLabel();
     const newLabel1 = LA.getNewLabel();
     const newLabel2 = LA.getNewLabel();
     const newLabel3 = LA.getNewLabel();
 
+    WS.IR += `br label %${newLabel0}\n`;
+    WS.IR += `${newLabel0}:\n`; 
     WS.IR += E.IR;
     WS.IR += `br label %${newLabel1}\n`;
     WS.IR += `${newLabel1}:\n`; 
@@ -792,7 +810,7 @@ const f33 = function(right, VST, FST) {
     WS.IR += `br i1 %${newTemp1}, label %${newLabel2}, label %${newLabel3}\n`;
     WS.IR += `${newLabel2}:\n`;
     WS.IR += SB.IR;
-    WS.IR += `br label %${newLabel1}\n`;
+    WS.IR += `br label %${newLabel0}\n`;
     WS.IR += `${newLabel3}:\n`;
 
     return WS;
@@ -1687,7 +1705,7 @@ IR_Generator.prototype._getFunc = function(record) {
  * @public
  * @param {string} newFilePath
  */
-IR_Generator.prototype.setFilePath = function(newFilePath) {
+IR_Generator.prototype.setProdNoFilePath = function(newFilePath) {
     this._filePath = newFilePath;
 };
 

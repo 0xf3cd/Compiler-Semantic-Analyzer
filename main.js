@@ -8,7 +8,8 @@ P.setGrammar('./Grammar/Grammar.txt');
 P.setSource('./Source/Example.cmm');
 P.initialize();
 
-
+I.setProdNoFilePath('./Grammar/Production-No.txt');
+I.setIRPath('./IR/IR.ll');
 I.readProdNoFile();
 
 while(true) {
