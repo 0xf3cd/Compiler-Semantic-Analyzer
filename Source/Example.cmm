@@ -1,4 +1,4 @@
-int b = 20;
+int b = -20;
 int c = 2;
 
 int main() {
@@ -7,8 +7,9 @@ int main() {
 
     int user_i = readi();
     float user_f = readf();
+    int x = -3;
 
-    writei(user_i);
+    writei(user_i + x);
     writef(user_f);
 
     return 0;

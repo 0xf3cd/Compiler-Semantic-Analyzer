@@ -1364,7 +1364,18 @@ const f49 = function(right, VST, FST) {
 };
 
 const f50 = function(right, VST, FST) {
-    // <Factor> -> fnum $ 50
+    // <Factor> -> - inum $ 50
+    const F = new Node();
+    const inum = deepCopy(right[1]);
+
+    F.val = '-' + inum.val;
+    F.valType = 'int';
+
+    return F;
+};
+
+const f51 = function(right, VST, FST) {
+    // <Factor> -> fnum $ 51
     const F = new Node();
     const fnum = deepCopy(right[0]);
 
@@ -1374,8 +1385,19 @@ const f50 = function(right, VST, FST) {
     return F;
 };
 
-const f51 = function(right, VST, FST) {
-    // <Factor> -> ( <Exprsn> ) $ 51
+const f52 = function(right, VST, FST) {
+    // <Factor> -> - fnum $ 52
+    const F = new Node();
+    const fnum = deepCopy(right[1]);
+
+    F.val = '-' + fnum.val;
+    F.valType = 'float';
+
+    return F;
+};
+
+const f53 = function(right, VST, FST) {
+    // <Factor> -> ( <Exprsn> ) $ 53
     const F = new Node();
     const E = deepCopy(right[1]);
 
@@ -1386,8 +1408,8 @@ const f51 = function(right, VST, FST) {
     return F;
 };
 
-const f52 = function(right, VST, FST) {
-	// <Factor> -> ID $ 52
+const f54 = function(right, VST, FST) {
+	// <Factor> -> ID $ 54
     const F = new Node();
     const ID = deepCopy(right[0]);
     
@@ -1410,8 +1432,8 @@ const f52 = function(right, VST, FST) {
     return F;
 };
 
-const f53 = function(right, VST, FST) {
-	// <Factor> -> ID <FuncCall> $ 53
+const f55 = function(right, VST, FST) {
+	// <Factor> -> ID <FuncCall> $ 55
 	const F = new Node();
 	const ID = deepCopy(right[0]);
 	const FC = deepCopy(right[1]);
@@ -1458,8 +1480,8 @@ const f53 = function(right, VST, FST) {
     return F;
 };
 
-const f54 = function(right, VST, FST) {
-	// <FuncCall> -> ( <ActualArgs> ) $ 54
+const f56 = function(right, VST, FST) {
+	// <FuncCall> -> ( <ActualArgs> ) $ 56
 	const F = new Node();
 	const Ac = deepCopy(right[1]);
 
@@ -1470,8 +1492,8 @@ const f54 = function(right, VST, FST) {
 	return F;
 };
 
-const f55 = function(right, VST, FST) {
-	// <ActualArgs> -> <ArgList> $ 55
+const f57 = function(right, VST, FST) {
+	// <ActualArgs> -> <ArgList> $ 57
 	const Ac = new Node();
 	const Arg = deepCopy(right[0]);
 
@@ -1482,8 +1504,8 @@ const f55 = function(right, VST, FST) {
 	return Ac;
 };
 
-const f56 = function(right, VST, FST) {
-	// <ActualArgs> -> void $ 56
+const f58 = function(right, VST, FST) {
+	// <ActualArgs> -> void $ 58
 	const A = new Node();
 	
 	A.args = new Array();
@@ -1492,8 +1514,8 @@ const f56 = function(right, VST, FST) {
 	return A;
 };
 
-const f57 = function(right, VST, FST) {
-	// <ActualArgs> -> ε $ 57
+const f59 = function(right, VST, FST) {
+	// <ActualArgs> -> ε $ 59
 	const A = new Node();
 
 	A.args = new Array();
@@ -1502,8 +1524,8 @@ const f57 = function(right, VST, FST) {
 	return A;
 };
 
-const f58 = function(right, VST, FST) {
-	// <ArgList> -> <Exprsn> , <ArgList> $ 58
+const f60 = function(right, VST, FST) {
+	// <ArgList> -> <Exprsn> , <ArgList> $ 60
 	const A1 = new Node();
 	const E = deepCopy(right[0]);
 	const A2 = deepCopy(right[2]);
@@ -1517,8 +1539,8 @@ const f58 = function(right, VST, FST) {
 	return A1;
 };
 
-const f59 = function(right, VST, FST) {
-    // <ArgList> -> <Exprsn> $ 59
+const f61 = function(right, VST, FST) {
+    // <ArgList> -> <Exprsn> $ 61
 	const A = new Node();
 	const E = deepCopy(right[0]);
 
@@ -1617,7 +1639,7 @@ class IR_Generator {
  * @private
  */
 IR_Generator.prototype._initialize = function() {
-    for(let i = 1; i <= 59; i++) {
+    for(let i = 1; i <= 61; i++) {
         const code = `this._allFuncs[${i}] = f${i};`;
         eval(code); // 执行上述代码
     }

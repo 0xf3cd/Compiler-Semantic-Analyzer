@@ -11,11 +11,6 @@ P.initialize();
 
 I.readProdNoFile();
 
-// console.log(`LR0: ${P.isLR0()}`);
-// console.log();
-// console.log(`SLR1: ${P.isSLR1()}`);
-// console.log();
-
 while(true) {
     let record = P.getNext();
 
@@ -30,6 +25,11 @@ while(true) {
     }
 }
 I.outputIR();
+
+// console.log(`LR0: ${P.isLR0()}`);
+// console.log();
+// console.log(`SLR1: ${P.isSLR1()}`);
+// console.log();
 
 // let t = P.getParseTree();
 // console.log(t); //S

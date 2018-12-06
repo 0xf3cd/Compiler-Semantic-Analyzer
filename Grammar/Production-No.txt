@@ -47,13 +47,15 @@ S -> <Body> S $ 3
 <Item> -> <Factor> / <Item> $ 47
 <Item> -> <Factor> $ 48
 <Factor> -> inum $ 49
-<Factor> -> fnum $ 50
-<Factor> -> ( <Exprsn> ) $ 51
-<Factor> -> ID $ 52
-<Factor> -> ID <FuncCall> $ 53
-<FuncCall> -> ( <ActualArgs> ) $ 54
-<ActualArgs> -> <ArgList> $ 55
-<ActualArgs> -> void $ 56
-<ActualArgs> -> ε $ 57
-<ArgList> -> <Exprsn> , <ArgList> $ 58
-<ArgList> -> <Exprsn> $ 59
+<Factor> -> - inum $ 50
+<Factor> -> fnum $ 51
+<Factor> -> - fnum $ 52
+<Factor> -> ( <Exprsn> ) $ 53
+<Factor> -> ID $ 54
+<Factor> -> ID <FuncCall> $ 55
+<FuncCall> -> ( <ActualArgs> ) $ 56
+<ActualArgs> -> <ArgList> $ 57
+<ActualArgs> -> void $ 58
+<ActualArgs> -> ε $ 59
+<ArgList> -> <Exprsn> , <ArgList> $ 60
+<ArgList> -> <Exprsn> $ 61

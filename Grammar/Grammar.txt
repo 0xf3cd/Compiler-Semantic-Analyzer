@@ -53,7 +53,7 @@ fnum 10
 } 27
 ε 28
 
-59
+61
 S' -> S $
 
 S -> <Body> $
@@ -122,7 +122,9 @@ S -> <Body> S $
 <Item> -> <Factor> $
 
 <Factor> -> inum $
+<Factor> -> - inum $
 <Factor> -> fnum $
+<Factor> -> - fnum $
 <Factor> -> ( <Exprsn> ) $
 <Factor> -> ID $
 <Factor> -> ID <FuncCall> $

@@ -75,7 +75,7 @@ attributes #1 = { "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-
 
 ; Head end
 
-@b = global i32 20
+@b = global i32 -20
 @c = global i32 2
 define i32 @main() {
 %tmp0 = load i32, i32* @b
@@ -89,9 +89,13 @@ store i32 %tmp3, i32* %user_i
 %tmp4 = call float @readf()
 %user_f = alloca float
 store float %tmp4, float* %user_f
+%x = alloca i32
+store i32 -3, i32* %x
 %tmp5 = load i32, i32* %user_i
-call void @writei(i32 %tmp5)
-%tmp6 = load float, float* %user_f
-call void @writef(float %tmp6)
+%tmp6 = load i32, i32* %x
+%tmp7 = add i32 %tmp5, %tmp6
+call void @writei(i32 %tmp7)
+%tmp8 = load float, float* %user_f
+call void @writef(float %tmp8)
 ret i32 0
 }
