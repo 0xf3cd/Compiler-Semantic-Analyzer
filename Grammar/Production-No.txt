@@ -8,9 +8,9 @@ S -> <Body> S $ 3
 <VarDecl> -> int ID = <Exprsn> ; $ 8
 <VarDecl> -> float ID ; $ 9
 <VarDecl> -> float ID = <Exprsn> ; $ 10
-<FuncDecl> -> int ID  ( <FormalParams> ) <StmtBlock> $ 11
-<FuncDecl> -> float ID  ( <FormalParams> ) <StmtBlock> $ 12
-<FuncDecl> -> void ID  ( <FormalParams> ) <StmtBlock> $ 13
+<FuncDecl> -> int ID ( <FormalParams> ) <StmtBlock> $ 11
+<FuncDecl> -> float ID ( <FormalParams> ) <StmtBlock> $ 12
+<FuncDecl> -> void ID ( <FormalParams> ) <StmtBlock> $ 13
 <FormalParams> -> <ParamList> $ 14
 <FormalParams> -> void $ 15
 <FormalParams> -> ε $ 16

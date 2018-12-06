@@ -153,13 +153,6 @@ const f1 = function(right, VST, FST) {
     return S_;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f2 = function(right, VST, FST) {
     // S -> <Body> $ 2
     const S = new Node();
@@ -170,13 +163,6 @@ const f2 = function(right, VST, FST) {
     return S;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f3 = function(right, VST, FST) {
     // S -> <Body> S $ 3
     const S1 = new Node();
@@ -189,13 +175,6 @@ const f3 = function(right, VST, FST) {
     return S1;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f4 = function(right, VST, FST) {
     // <Body> -> <Decl> $ 4
     const B = new Node();
@@ -206,13 +185,6 @@ const f4 = function(right, VST, FST) {
     return B;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f5 = function(right, VST, FST) {
     // <Decl> -> <VarDecl> $ 5
     const D = new Node();
@@ -223,13 +195,6 @@ const f5 = function(right, VST, FST) {
     return D;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f6 = function(right, VST, FST) {
     // <Decl> -> <FuncDecl> $ 6
     const D = new Node();
@@ -240,13 +205,6 @@ const f6 = function(right, VST, FST) {
     return D;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f7 = function(right, VST, FST) {
     // <VarDecl> -> int ID ; $ 7
     const VD = new Node();
@@ -259,19 +217,12 @@ const f7 = function(right, VST, FST) {
     const storeVal = '0';
 
     VD.IR += `%${newTemp1} = alloca ${varType}\n`;
-    VD.IR += `store ${varType} ${storeVal}, ${varType}* ${newTemp1}\n`;
-    VD.IR += `%${ID.val} = load ${varType}, ${varType}* ${newTemp1}\n`;  // 此时 ID.val 中储存着带返回值
+    VD.IR += `store ${varType} ${storeVal}, ${varType}* %${newTemp1}\n`;
+    VD.IR += `%${ID.val} = load ${varType}, ${varType}* %${newTemp1}\n`;  // 此时 ID.val 中储存着带返回值
 
     return VD;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f8 = function(right, VST, FST) {
     // <VarDecl> -> int ID = <Exprsn> ; $ 8
     const VD = new Node();
@@ -296,19 +247,12 @@ const f8 = function(right, VST, FST) {
 
     VD.IR += E.IR;
     VD.IR += `%${newTemp1} = alloca ${varType}\n`;
-    VD.IR += `store ${varType} ${storeVal}, ${varType}* ${newTemp1}\n`;
-    VD.IR += `%${ID.val} = load ${varType}, ${varType}* ${newTemp1}\n`;  // 此时 ID.val 中储存着带返回值
+    VD.IR += `store ${varType} ${storeVal}, ${varType}* %${newTemp1}\n`;
+    VD.IR += `%${ID.val} = load ${varType}, ${varType}* %${newTemp1}\n`;  // 此时 ID.val 中储存着带返回值
 
     return VD;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f9 = function(right, VST, FST) {
     // <VarDecl> -> float ID ; $ 9
     const VD = new Node();
@@ -321,19 +265,12 @@ const f9 = function(right, VST, FST) {
     const storeVal = representFloat('0.0');
 
     VD.IR += `%${newTemp1} = alloca ${varType}\n`;
-    VD.IR += `store ${varType} ${storeVal}, ${varType}* ${newTemp1}\n`;
+    VD.IR += `store ${varType} ${storeVal}, ${varType}* %${newTemp1}\n`;
     VD.IR += `%${ID.val} = load ${varType}, ${varType}* ${newTemp1}\n`;  // 此时 ID.val 中储存着带返回值
 
     return VD;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f10 = function(right, VST, FST) {
     // <VarDecl> -> float ID = <Exprsn> ; $ 10
     const VD = new Node();
@@ -358,19 +295,12 @@ const f10 = function(right, VST, FST) {
 
     VD.IR += E.IR;
     VD.IR += `%${newTemp1} = alloca ${varType}\n`;
-    VD.IR += `store ${varType} ${storeVal}, ${varType}* ${newTemp1}\n`;
-    VD.IR += `%${ID.val} = load ${varType}, ${varType}* ${newTemp1}\n`;  // 此时 ID.val 中储存着带返回值
+    VD.IR += `store ${varType} ${storeVal}, ${varType}* %${newTemp1}\n`;
+    VD.IR += `%${ID.val} = load ${varType}, ${varType}* %${newTemp1}\n`;  // 此时 ID.val 中储存着带返回值
 
     return VD;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f11 = function(right, VST, FST) {
     // <FuncDecl> -> int ID  ( <FormalParams> ) <StmtBlock> $ 11
     if(SB.returnType !== 'int') {
@@ -386,13 +316,6 @@ const f11 = function(right, VST, FST) {
     return FD;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f12 = function(right, VST, FST) {
     // <FuncDecl> -> float ID  ( <FormalParams> ) <StmtBlock> $ 12
     const FD = new Node();
@@ -412,13 +335,6 @@ const f12 = function(right, VST, FST) {
     return FD;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f13 = function(right, VST, FST) {
     // <FuncDecl> -> void ID  ( <FormalParams> ) <StmtBlock> $ 13
     const FD = new Node();
@@ -438,13 +354,6 @@ const f13 = function(right, VST, FST) {
     return FD;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f14 = function(right, VST, FST) {
     // <FormalParams> -> <ParamList> $ 14
     const FP = new Node();
@@ -457,39 +366,18 @@ const f14 = function(right, VST, FST) {
     return FP;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f15 = function(right, VST, FST) {
     // <FormalParams> -> void $ 15
     const FP = new Node();
     return FP;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f16 = function(right, VST, FST) {
     // <FormalParams> -> ε $ 16
     const FP = new Node();
     return FP;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f17 = function(right, VST, FST) {
     // <ParamList> -> <Param> $ 17
     const PL = new Node();
@@ -502,13 +390,6 @@ const f17 = function(right, VST, FST) {
     return PL;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f18 = function(right, VST, FST) {
     // <ParamList> -> <Param> , <ParamList> $ 18
     const PL1 = new Node();
@@ -525,13 +406,6 @@ const f18 = function(right, VST, FST) {
     return PL1;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f19 = function(right, VST, FST) {
     // <Param> -> int ID $ 19
     const P = new Node();
@@ -544,13 +418,6 @@ const f19 = function(right, VST, FST) {
     return P;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f20 = function(right, VST, FST) {
     // <Param> -> float ID $ 20
     const P = new Node();
@@ -563,13 +430,6 @@ const f20 = function(right, VST, FST) {
     return P;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f21 = function(right, VST, FST) {
     // <StmtBlock> -> { <Stmts> } $ 21
     const SB = new Node();
@@ -584,13 +444,6 @@ const f21 = function(right, VST, FST) {
     return SB;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f22 = function(right, VST, FST) {
     // <Stmts> -> <Stmt> <Stmts> $ 22
     const Ss1 = new Node();
@@ -609,13 +462,6 @@ const f22 = function(right, VST, FST) {
     return Ss1;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f23 = function(right, VST, FST) {
     // <Stmts> -> <Stmt> $ 23
     const Ss = new Node();
@@ -628,13 +474,6 @@ const f23 = function(right, VST, FST) {
     return Ss;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f24 = function(right, VST, FST) {
     // <Stmt> -> <VarDecl> $ 24
     const S = new Node();
@@ -647,13 +486,6 @@ const f24 = function(right, VST, FST) {
     return S;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f25 = function(right, VST, FST) {
     // <Stmt> -> <IfStmt> $ 25
     const S = new Node();
@@ -665,13 +497,6 @@ const f25 = function(right, VST, FST) {
     return S;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f26 = function(right, VST, FST) {
     // <Stmt> -> <WhileStmt> $ 26
     const S = new Node();
@@ -683,13 +508,6 @@ const f26 = function(right, VST, FST) {
     return S;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f27 = function(right, VST, FST) {
     // <Stmt> -> <ReturnStmt> $ 27
     const S = new Node();
@@ -701,13 +519,6 @@ const f27 = function(right, VST, FST) {
     return S;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f28 = function(right, VST, FST) {
     // <Stmt> -> <AssignStmt> $ 28
     const S = new Node();
@@ -719,13 +530,6 @@ const f28 = function(right, VST, FST) {
     return S;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f29 = function(right, VST, FST) {
     // <AssignStmt> -> ID = <Exprsn> ; $ 29
     const A = new Node();
@@ -754,20 +558,13 @@ const f29 = function(right, VST, FST) {
 
     A.IR += E.IR;
     A.IR += `%${newTemp1} = alloca ${varType}\n`;
-    A.IR += `store ${varType} ${storeVal}, ${varType}* ${newTemp1}\n`;
-    A.IR += `%${newTemp2} = load ${varType}, ${varType}* ${newTemp1}\n`;  // 此时 newTemp2 中储存着带返回值
+    A.IR += `store ${varType} ${storeVal}, ${varType}* %${newTemp1}\n`;
+    A.IR += `%${newTemp2} = load ${varType}, ${varType}* %${newTemp1}\n`;  // 此时 newTemp2 中储存着带返回值
     A.IR += `ret ${varType} ${newTemp2}\n`; 
 
     return A;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f30 = function(right, VST, FST) {
     // <ReturnStmt> -> return <Exprsn> ; $ 30
     const RS = new Node();
@@ -785,13 +582,6 @@ const f30 = function(right, VST, FST) {
     return RS;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f31 = function(right, VST, FST) {
     // <ReturnStmt> -> return ; $ 31
     const RS = new Node();
@@ -802,13 +592,6 @@ const f31 = function(right, VST, FST) {
     return RS;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f32 = function(right, VST, FST) {
     // <WhileStmt> -> while ( <Exprsn> ) <StmtBlock> $ 32
     const WS = new Node();
@@ -839,13 +622,6 @@ const f32 = function(right, VST, FST) {
     return WS;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f33 = function(right, VST, FST) {
     // <IfStmt> -> if ( <Exprsn> ) <StmtBlock> else <StmtBlock> $ 33
     const IS = new Node();
@@ -882,13 +658,6 @@ const f33 = function(right, VST, FST) {
     return IS;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f34 = function(right, VST, FST) {
     // <IfStmt> -> if ( <Exprsn> ) <StmtBlock> $ 34
     const IS = new Node();
@@ -921,13 +690,6 @@ const f34 = function(right, VST, FST) {
     return IS;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f35 = function(right, VST, FST) {
     // <Exprsn> -> <AddExprsn> $ 35
     const E = new Node();
@@ -940,13 +702,6 @@ const f35 = function(right, VST, FST) {
     return E;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f36 = function(right, VST, FST) {
     // <Exprsn> -> <AddExprsn> < <Exprsn> $ 36
     const E1 = new Node();
@@ -995,13 +750,6 @@ const f36 = function(right, VST, FST) {
     return E1;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f37 = function(right, VST, FST) {
     // <Exprsn> -> <AddExprsn> <= <Exprsn> $ 37
     const E1 = new Node();
@@ -1050,13 +798,6 @@ const f37 = function(right, VST, FST) {
     return E1;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f38 = function(right, VST, FST) {
     // <Exprsn> -> <AddExprsn> > <Exprsn> $ 38
     const E1 = new Node();
@@ -1105,13 +846,6 @@ const f38 = function(right, VST, FST) {
     return E1;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f39 = function(right, VST, FST) {
     // <Exprsn> -> <AddExprsn> >= <Exprsn> $ 39
     const E1 = new Node();
@@ -1160,13 +894,6 @@ const f39 = function(right, VST, FST) {
     return E1;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f40 = function(right, VST, FST) {
     // <Exprsn> -> <AddExprsn> == <Exprsn> $ 40
     const E1 = new Node();
@@ -1215,13 +942,6 @@ const f40 = function(right, VST, FST) {
     return E1;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f41 = function(right, VST, FST) {
     // <Exprsn> -> <AddExprsn> != <Exprsn> $ 41
     const E1 = new Node();
@@ -1270,13 +990,6 @@ const f41 = function(right, VST, FST) {
     return E1;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f42 = function(right, VST, FST) {
     // <AddExprsn> -> <Item> + <AddExprsn> $ 42
     const A1 = new Node();
@@ -1314,13 +1027,6 @@ const f42 = function(right, VST, FST) {
     return A1;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f43 = function(right, VST, FST) {
     // <AddExprsn> -> <Item> - <AddExprsn> $ 43
     const A1 = new Node();
@@ -1358,13 +1064,6 @@ const f43 = function(right, VST, FST) {
     return A1;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f44 = function(right, VST, FST) {
     // <AddExprsn> -> <Item> $ 44
     const A = new Node();
@@ -1377,13 +1076,6 @@ const f44 = function(right, VST, FST) {
     return A;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f45 = function(right, VST, FST) {
     // <Item> -> <Factor> * <Item> $ 45
     const I1 = new Node();
@@ -1421,13 +1113,6 @@ const f45 = function(right, VST, FST) {
     return I1;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f46 = function(right, VST, FST) {
     // <Item> -> <Factor> / <Item> $ 46
     const I1 = new Node();
@@ -1465,13 +1150,6 @@ const f46 = function(right, VST, FST) {
     return I1;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f47 = function(right, VST, FST) {
     // <Item> -> <Factor> $ 47
     const I = new Node();
@@ -1484,31 +1162,17 @@ const f47 = function(right, VST, FST) {
     return I;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f48 = function(right, VST, FST) {
     // <Factor> -> inum $ 48
     const F = new Node();
     const inum = deepCopy(right[0]);
 
-    F.val = fnum.val;
+    F.val = inum.val;
     F.valType = 'int';
 
     return F;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f49 = function(right, VST, FST) {
     // <Factor> -> fnum $ 49
     const F = new Node();
@@ -1520,13 +1184,6 @@ const f49 = function(right, VST, FST) {
     return F;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f50 = function(right, VST, FST) {
     // <Factor> -> ( <Exprsn> ) $ 50
     const F = new Node();
@@ -1539,13 +1196,6 @@ const f50 = function(right, VST, FST) {
     return F;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f51 = function(right, VST, FST) {
 	// <Factor> -> ID $ 51
     const F = new Node();
@@ -1563,13 +1213,6 @@ const f51 = function(right, VST, FST) {
     return F;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f52 = function(right, VST, FST) {
 	// <Factor> -> ID <FuncCall> $ 52
 	const F = new Node();
@@ -1613,13 +1256,6 @@ const f52 = function(right, VST, FST) {
     return F;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f53 = function(right, VST, FST) {
 	// <FuncCall> -> ( <ActualArgs> ) $ 53
 	const F = new Node();
@@ -1632,13 +1268,6 @@ const f53 = function(right, VST, FST) {
 	return F;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f54 = function(right, VST, FST) {
 	// <ActualArgs> -> <ArgList> $ 54
 	const Ac = new Node();
@@ -1651,13 +1280,6 @@ const f54 = function(right, VST, FST) {
 	return Ac;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f55 = function(right, VST, FST) {
 	// <ActualArgs> -> void $ 55
 	const A = new Node();
@@ -1668,13 +1290,6 @@ const f55 = function(right, VST, FST) {
 	return A;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f56 = function(right, VST, FST) {
 	// <ActualArgs> -> ε $ 56
 	const A = new Node();
@@ -1685,13 +1300,6 @@ const f56 = function(right, VST, FST) {
 	return A;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f57 = function(right, VST, FST) {
 	// <ArgList> -> <Exprsn> , <ArgList> $ 57
 	const A1 = new Node();
@@ -1707,13 +1315,6 @@ const f57 = function(right, VST, FST) {
 	return A1;
 };
 
-/**
- * 对应产生式 
- * @param right {Array.<Node>} 产生式右部 
- * @param VST {VarTable} 符号表
- * @param FST {FuncTable} 函数表
- * @return {Node}
- */
 const f58 = function(right, VST, FST) {
     // <ArgList> -> <Exprsn> $ 58
 	const A = new Node();
@@ -1802,10 +1403,24 @@ IR_Generator.prototype._initialize = function() {
 /**
  * 根据传入的 Record 对象，选取本次规约应当使用的语义分析和处理函数
  * @private
- * @param {Object} record 
+ * @param {Record} record 
  * @return {Function} 返回应该执行的处理函数
  */
-IR_Generator.prototype._getFunc = function(record) {};
+IR_Generator.prototype._getFunc = function(record) {
+    const pLeft = record.productionLeft;
+    const pRight = record.productionRight;
+
+    let key = pLeft;
+    for(let each of pRight) {
+        key += ' ';
+        key += each;
+    }
+    const pNo = this._prodNo[key];
+    const f = this._allFuncs[pNo];
+
+    // console.log(f);
+    return f;
+};
 
 /**
  * 设置文件地址
@@ -1847,11 +1462,44 @@ IR_Generator.prototype.readProdNoFile = function() {
  * @public
  * @param {Object} record
  */
-IR_Generator.prototype.analyze = function(record) {};
+IR_Generator.prototype.analyze = function(record) {
+    if(record.parseResult[0] === 's') {
+        console.log('line: ' + record.lineNum + 'shift in\n');
+        const N = new Node();
+        N.name = record.symbolName;
+        N.val = record.tokenValue;
+        this._topNodes.push(N);
+    } else if(record.parseResult[0] === 'r') {
+        console.log('line: ' + record.lineNum + 'reduce');
+        console.log(record.productionLeft + ' -> ' + record.productionRight)
+        const f = this._getFunc(record); // 得到语义分析函数
+
+        const rightNodes = new Array();
+        const rightAmount = record.productionRight.length; //产生式右部的符号个数
+        for(let i = 0; i < rightAmount; i++) {
+            const tN = this._topNodes.pop();
+            rightNodes.unshift(tN);
+        }
+        // 此时得到所有待规约符号
+
+        const leftNode = f(rightNodes, this._varTable, this._funcTable);
+        console.log(leftNode);
+        console.log();
+        this._topNodes.push(leftNode);
+    } else if(record.parseResult === 'acc') {
+        console.log('acc');
+        console.log(this._topNodes[0].IR);
+    } else if(record.parseResult === 'error') {
+        console.log('error');
+
+    } else {
+
+    }
+};
 
 
-const IR = new IR_Generator();
-IR.readProdNoFile();
+// const IR = new IR_Generator();
+// IR.readProdNoFile();
 // const x = IR._allFuncs[51];
 // x();
 

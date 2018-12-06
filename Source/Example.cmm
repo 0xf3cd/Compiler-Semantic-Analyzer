@@ -1,24 +1,8 @@
 float x = .3;
-int y = x * x;
-float z;
-int w = x > y * (0.7 + b / (z != x)) - (x * x <= z);
+float y = x * x;
+float z = 1.0;
 
-float f1(int a) {
-    int b = a * a;
-    return b;
-}
-
-void f2() {
-    return 108 * f1(18);
-}
-
-int main(void) {
-    if(((f1(100) + f2(void) > 10.5)) != 100 + 25.9) {
-        float p = x + 2.5;
-        return p;
-    } else {
-        int q = 10 + w;
-        return q;
-    }
-}
+int a = 19;
+int b = 20;
+int x = 2;
 #

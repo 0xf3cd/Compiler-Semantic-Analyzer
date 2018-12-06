@@ -50,6 +50,13 @@ const deepCopy = function(oldObject) {
 class Record {
     constructor() {
         /**
+         * 所在行号
+         * @public
+         * @type {number}
+         */
+        this.lineNum = -1;
+
+        /**
          * 读取的 token 的值，如 int { ) ; a 100 等
          * @public
          * @type {string}
@@ -115,6 +122,7 @@ class Record {
  * @return {void}
  */
 Record.prototype.save = function(jss) {
+    this.lineNum = jss.token.line_num;
     this.tokenValue = jss.token.value.toString();
     this.tokenType = jss.token.type;
     this.symbolName = jss.symbol_name.toString();
