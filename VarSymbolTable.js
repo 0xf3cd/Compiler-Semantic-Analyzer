@@ -26,6 +26,14 @@ class VarItem {
          * @type {boolean}
          */
         this.isGlobal = false;
+
+
+        /**
+         * 指示变量是否是指针
+         * @public
+         * @type {boolean}
+         */
+        this.isPointer = false;
     }
 }
 
@@ -148,6 +156,35 @@ VarSymbolTable.prototype.isGlobal = function(varName) {
     for(let each of this._table) {
         if(each.varName === varName) {
             return each.isGlobal;
+        }
+    }
+    return null;
+};
+
+/**
+ * 设置一个变量为指针类型
+ * @public
+ * @param {string} varName
+ */
+VarSymbolTable.prototype.setPointer = function(varName) {
+    for(let each of this._table) {
+        if(each.varName === varName) {
+            each.isPointer = true;
+        }
+    }
+};
+
+/**
+ * 查询某个变量是否为指针类型
+ * 如果不存在这个变量返回 null
+ * @public
+ * @param {string} varName
+ * @return {boolean}
+ */
+VarSymbolTable.prototype.isPointer = function(varName) {
+    for(let each of this._table) {
+        if(each.varName === varName) {
+            return each.isPointer;
         }
     }
     return null;

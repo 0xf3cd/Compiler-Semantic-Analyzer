@@ -193,7 +193,6 @@ const f5 = function(right, VST, FST) {
     D.IR = VD.IR;
     const allIR = D.IR.split('\n');
     allIR.pop(); // 除去最后的空字符串
-    const l3 = allIR.pop();
     const l2 = allIR.pop();
     const l1 = allIR.pop(); // 得到末尾三句中间代码，即局部性的变量申明和赋值语句
 
@@ -203,7 +202,7 @@ const f5 = function(right, VST, FST) {
         throw new Error(errorInfo);
     }
     // 否则说明声明时指定为常数了
-    const varName = l3.split(' ')[0].split('%')[1]; // 操作中间代码可以得到变量名（没有利用继承属性传上了）
+    const varName = l1.split(' ')[0].split('%')[1]; // 操作中间代码可以得到变量名（没有利用继承属性传上了）
     const varType = VST.getVarType(varName);
     VST.setGlobal(varName); // 将变量设为全局的
     allIR.push(`@${varName} = global ${varType === 'int'? 'i32': 'float'} ${varValue}`);
@@ -243,13 +242,13 @@ const f7 = function(right, VST, FST) {
 
     VST.append(ID.val, 'int');
 
-    const newTemp1 = TA.getNewTemp(); // 指针
+    // const newTemp1 = TA.getNewTemp(); // 指针
     const varType = 'i32';
     const storeVal = '0';
 
-    VD.IR += `%${newTemp1} = alloca ${varType}\n`;
-    VD.IR += `store ${varType} ${storeVal}, ${varType}* %${newTemp1}\n`;
-    VD.IR += `%${ID.val} = load ${varType}, ${varType}* %${newTemp1}\n`;  // 此时 ID.val 中储存着带返回值
+    VD.IR += `%${ID.val} = alloca ${varType}\n`;
+    VD.IR += `store ${varType} ${storeVal}, ${varType}* %${ID.val}\n`;
+    // VD.IR += `%${ID.val} = load ${varType}, ${varType}* %${newTemp1}\n`;  // 此时 ID.val 中储存着带返回值
 
     return VD;
 };
@@ -275,7 +274,7 @@ const f8 = function(right, VST, FST) {
 
     VST.append(ID.val, 'int');
 
-    const newTemp1 = TA.getNewTemp(); // 指针
+    // const newTemp1 = TA.getNewTemp(); // 指针
     const varType = 'i32';
     let storeVal;
     if(hasLetter(E.val)) {
@@ -285,9 +284,9 @@ const f8 = function(right, VST, FST) {
     }
 
     VD.IR += E.IR;
-    VD.IR += `%${newTemp1} = alloca ${varType}\n`;
-    VD.IR += `store ${varType} ${storeVal}, ${varType}* %${newTemp1}\n`;
-    VD.IR += `%${ID.val} = load ${varType}, ${varType}* %${newTemp1}\n`;  // 此时 ID.val 中储存着带返回值
+    VD.IR += `%${ID.val} = alloca ${varType}\n`;
+    VD.IR += `store ${varType} ${storeVal}, ${varType}* %${ID.val}\n`;
+    // VD.IR += `%${ID.val} = load ${varType}, ${varType}* %${newTemp1}\n`;  // 此时 ID.val 中储存着带返回值
 
     return VD;
 };
@@ -308,13 +307,13 @@ const f9 = function(right, VST, FST) {
 
     VST.append(ID.val, 'float');
 
-    const newTemp1 = TA.getNewTemp(); // 指针
+    // const newTemp1 = TA.getNewTemp(); // 指针
     const varType = 'float';
     const storeVal = representFloat('0.0');
 
-    VD.IR += `%${newTemp1} = alloca ${varType}\n`;
-    VD.IR += `store ${varType} ${storeVal}, ${varType}* %${newTemp1}\n`;
-    VD.IR += `%${ID.val} = load ${varType}, ${varType}* ${newTemp1}\n`;  // 此时 ID.val 中储存着带返回值
+    VD.IR += `%${ID.val} = alloca ${varType}\n`;
+    VD.IR += `store ${varType} ${storeVal}, ${varType}* %${ID.val}\n`;
+    // VD.IR += `%${ID.val} = load ${varType}, ${varType}* ${newTemp1}\n`;  // 此时 ID.val 中储存着带返回值
 
     return VD;
 };
@@ -340,7 +339,7 @@ const f10 = function(right, VST, FST) {
 
     VST.append(ID.val, 'float');
 
-    const newTemp1 = TA.getNewTemp(); // 指针
+    // const newTemp1 = TA.getNewTemp(); // 指针
     const varType = 'float';
     let storeVal;
     if(hasLetter(E.val)) {
@@ -350,9 +349,9 @@ const f10 = function(right, VST, FST) {
     }
 
     VD.IR += E.IR;
-    VD.IR += `%${newTemp1} = alloca ${varType}\n`;
-    VD.IR += `store ${varType} ${storeVal}, ${varType}* %${newTemp1}\n`;
-    VD.IR += `%${ID.val} = load ${varType}, ${varType}* %${newTemp1}\n`;  // 此时 ID.val 中储存着带返回值
+    VD.IR += `%${ID.val} = alloca ${varType}\n`;
+    VD.IR += `store ${varType} ${storeVal}, ${varType}* %${ID.val}\n`;
+    // VD.IR += `%${ID.val} = load ${varType}, ${varType}* %${newTemp1}\n`;  // 此时 ID.val 中储存着带返回值
 
     return VD;
 };
@@ -658,7 +657,48 @@ const f28 = function(right, VST, FST) {
 };
 
 const f29 = function(right, VST, FST) {
+    // <Stmt> -> ID <FuncCall> ; $ 29
+    const S = new Node();
+	const ID = deepCopy(right[0]);
+	const FC = deepCopy(right[1]);
 
+    if(FST.getReturnType(ID.val) === null) {
+        const errorInfo = 'Function called didn\'t be declared';
+        throw new Error(errorInfo);
+    }
+	if(!FST.hasFunc(ID.val, FC.argType)) {
+        const errorInfo = 'Function parameter type don\'t match';
+        throw new Error(errorInfo);
+    }
+    // 至此通过函数参数类型检查
+    const funcReturnType = FST.getReturnType(ID.val);
+    if(funcReturnType !== 'void') {
+        const errorInfo = `Call a function which returns ${funcReturnType}`;
+        throw new Error(errorInfo);
+    }
+    // 通过函数返回值类型检查
+
+    S.IR = FC.IR;
+    S.IR += `call void @${ID.val}(`;
+    for(let i = 0; i < FC.args.length; i++) {
+        if(i !== 0) {
+            S.IR += ', ';
+        }
+        const argName = FC.args[i];
+        const argType = FC.argType[i];
+
+        S.IR += (argType === 'int')? 'i32': 'float';
+
+        if(hasLetter(argName)) {
+            S.IR += ` %${argName}`;
+        } else {
+            S.IR += ` ${(argType === 'int')? argName: representFloat(argName)}`;
+        }
+    }
+    S.IR += ')\n';
+    S.returnType = 'void';
+
+    return S;
 };
 
 const f30 = function(right, VST, FST) {
@@ -689,10 +729,11 @@ const f30 = function(right, VST, FST) {
         // 对全局变量赋值不能使用普通方式
         A.IR += `store ${varType} ${storeVal}, ${varType}* @${ID.val}\n`;
     } else {
-        const newTemp1 = TA.getNewTemp(); // 指针
-        A.IR += `%${newTemp1} = alloca ${varType}\n`;
-        A.IR += `store ${varType} ${storeVal}, ${varType}* %${newTemp1}\n`;
-        A.IR += `%${ID.val} = load ${varType}, ${varType}* %${newTemp1}\n`;  // 此时 newTemp2 中储存着带返回值
+        // const newTemp1 = TA.getNewTemp(); // 指针
+        // A.IR += `%${newTemp1} = alloca ${varType}\n`;
+        // A.IR += `store ${varType} ${storeVal}, ${varType}* %${newTemp1}\n`;
+        // A.IR += `%${ID.val} = load ${varType}, ${varType}* %${newTemp1}\n`;  // 此时 newTemp2 中储存着带返回值
+        A.IR += `store ${varType} ${storeVal}, ${varType}* %${ID.val}\n`;
     }
 
     return A;
@@ -710,7 +751,8 @@ const f31 = function(right, VST, FST) {
     } else {
         rtValue = 'float ' + (hasLetter(E.val)? `%${E.val}`: representFloat(E.val));
     }
-    RS.IR = 'ret ' + rtValue + '\n';
+    RS.IR += E.IR;
+    RS.IR += 'ret ' + rtValue + '\n';
 
     return RS;
 };
@@ -744,6 +786,7 @@ const f33 = function(right, VST, FST) {
     const newLabel3 = LA.getNewLabel();
 
     WS.IR += E.IR;
+    WS.IR += `br label %${newLabel1}\n`;
     WS.IR += `${newLabel1}:\n`; 
     WS.IR += `%${newTemp1} = icmp eq i32 ${hasLetter(E.val)? ('%' + E.val): E.val}, 1\n`;
     WS.IR += `br i1 %${newTemp1}, label %${newLabel2}, label %${newLabel3}\n`;
@@ -763,15 +806,23 @@ const f34 = function(right, VST, FST) {
     const SB2 = deepCopy(right[6]);
 
     if(SB1.returnType !== SB2.returnType) {
-        const errorInfo = 'The values returnd have different types';
-        throw new Error(errorInfo);
+        if(SB1.returnType === 'void') {
+            IS.returnType = SB2.returnType;
+        } else if(SB2.returnType === 'void') {
+            IS.returnType = SB1.returnType;
+        } else {
+            const errorInfo = 'The values returnd have different types';
+            throw new Error(errorInfo);
+        }
+    } else {
+        IS.returnType = SB1.returnType;
     }
+
     if(E.valType !== 'int') {
         const errorInfo = 'If branch condition must be of int';
         throw new Error(errorInfo);
     }
     // 类型检查通过
-    IS.returnType = SB1.returnType;
 
     const newTemp1 = TA.getNewTemp(); // i1 
     const newLabel1 = LA.getNewLabel();
@@ -877,6 +928,7 @@ const f37 = function(right, VST, FST) {
     E1.IR += `br label %${newLabel3}\n`;
     E1.IR += `${newLabel2}:\n`;
     E1.IR += `store i32 0, i32* %${newTemp2}\n`; // 结果为 0
+    E1.IR += `br label %${newLabel3}\n`;
     E1.IR += `${newLabel3}:\n`;
     E1.IR += `%${newTemp3} = load i32, i32* %${newTemp2}\n`; // 从 i32* 的指针指向的地址中取值并且赋给 nT3
 
@@ -925,6 +977,7 @@ const f38 = function(right, VST, FST) {
     E1.IR += `br label %${newLabel3}\n`;
     E1.IR += `${newLabel2}:\n`;
     E1.IR += `store i32 0, i32* %${newTemp2}\n`; // 结果为 0
+    E1.IR += `br label %${newLabel3}\n`;
     E1.IR += `${newLabel3}:\n`;
     E1.IR += `%${newTemp3} = load i32, i32* %${newTemp2}\n`; // 从 i32* 的指针指向的地址中取值并且赋给 nT3
 
@@ -973,6 +1026,7 @@ const f39 = function(right, VST, FST) {
     E1.IR += `br label %${newLabel3}\n`;
     E1.IR += `${newLabel2}:\n`;
     E1.IR += `store i32 0, i32* %${newTemp2}\n`; // 结果为 0
+    E1.IR += `br label %${newLabel3}\n`;
     E1.IR += `${newLabel3}:\n`;
     E1.IR += `%${newTemp3} = load i32, i32* %${newTemp2}\n`; // 从 i32* 的指针指向的地址中取值并且赋给 nT3
 
@@ -1021,6 +1075,7 @@ const f40 = function(right, VST, FST) {
     E1.IR += `br label %${newLabel3}\n`;
     E1.IR += `${newLabel2}:\n`;
     E1.IR += `store i32 0, i32* %${newTemp2}\n`; // 结果为 0
+    E1.IR += `br label %${newLabel3}\n`;
     E1.IR += `${newLabel3}:\n`;
     E1.IR += `%${newTemp3} = load i32, i32* %${newTemp2}\n`; // 从 i32* 的指针指向的地址中取值并且赋给 nT3
 
@@ -1069,6 +1124,7 @@ const f41 = function(right, VST, FST) {
     E1.IR += `br label %${newLabel3}\n`;
     E1.IR += `${newLabel2}:\n`;
     E1.IR += `store i32 0, i32* %${newTemp2}\n`; // 结果为 0
+    E1.IR += `br label %${newLabel3}\n`;
     E1.IR += `${newLabel3}:\n`;
     E1.IR += `%${newTemp3} = load i32, i32* %${newTemp2}\n`; // 从 i32* 的指针指向的地址中取值并且赋给 nT3
 
@@ -1117,6 +1173,7 @@ const f42 = function(right, VST, FST) {
     E1.IR += `br label %${newLabel3}\n`;
     E1.IR += `${newLabel2}:\n`;
     E1.IR += `store i32 0, i32* %${newTemp2}\n`; // 结果为 0
+    E1.IR += `br label %${newLabel3}\n`;
     E1.IR += `${newLabel3}:\n`;
     E1.IR += `%${newTemp3} = load i32, i32* %${newTemp2}\n`; // 从 i32* 的指针指向的地址中取值并且赋给 nT3
 
@@ -1341,16 +1398,14 @@ const f52 = function(right, VST, FST) {
     }
     // 至此变量检查结束
 
+    const newTemp1 = TA.getNewTemp();
+    F.val = newTemp1;
+    F.valType = VST.getVarType(ID.val);
+    const varType = (F.valType === 'int')? 'i32': 'float';
     if(VST.isGlobal(ID.val)) {
-        const newTemp1 = TA.getNewTemp();
-        F.val = newTemp1;
-        F.valType = VST.getVarType(ID.val);
-        const varType = (F.valType === 'int')? 'i32': 'float';
-        
         F.IR += `%${newTemp1} = load ${varType}, ${varType}* @${ID.val}\n`;
     } else {
-        F.val = ID.val;
-        F.valType = VST.getVarType(ID.val);
+        F.IR += `%${newTemp1} = load ${varType}, ${varType}* %${ID.val}\n`;
     }
 
     return F;
@@ -1375,18 +1430,18 @@ const f53 = function(right, VST, FST) {
         throw new Error(errorInfo);
     }
     // 通过函数返回值类型检查
-    const newTemp = TA.getNewTemp();
+    const newTemp = TA.getNewTemp(); // 申请一个局部变量的空间
     F.val = newTemp;
     F.valType = funcReturnType;
 
     F.IR = FC.IR;
     F.IR += `%${newTemp} = call ${(funcReturnType === 'int')? 'i32': 'float'} @${ID.val}(`;
-    for(let i = 0; i < F.args.length; i++) {
+    for(let i = 0; i < FC.args.length; i++) {
         if(i !== 0) {
             F.IR += ', ';
         }
-        const argName = F.args[i];
-        const argType = F.argType[i];
+        const argName = FC.args[i];
+        const argType = FC.argType[i];
 
         F.IR += (argType === 'int')? 'i32': 'float';
 

@@ -1,21 +1,27 @@
 int b = 20;
 int c = 2;
 
-/*
-void printi(int x) {
+void writei(int x) {
     return;
 }
 
 int readi() {
     return b;
 }
-*/
 
-int main(int cc) {
+int main() {
     int bb = 9 * b + c;
     if(bb) {
-        int x = 13;
+        bb = bb + 1;
+        return bb;
+    } else {
+        int cc = bb + 13 * readi();
+        while(cc <= 100) {
+            cc = cc + 2;
+        }
+        return cc;
     }
-    return bb;
+    writei(bb);
+    return 14;
 }
 #
