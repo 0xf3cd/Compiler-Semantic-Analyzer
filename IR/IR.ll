@@ -71,6 +71,10 @@ attributes #1 = { "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-
 !0 = !{i32 1, !"wchar_size", i32 4}
 !1 = !{i32 7, !"PIC Level", i32 2}
 !2 = !{!"Apple LLVM version 10.0.0 (clang-1000.11.45.5)"}
+
+
+; Head end
+
 @b = global i32 20
 @c = global i32 2
 define i32 @main() {
@@ -80,14 +84,14 @@ call void @writei(i32 %tmp0)
 %tmp2 = call float @itof(i32 %tmp1)
 call void @writef(float %tmp2)
 %tmp3 = call i32 @readi()
-%useri = alloca i32
-store i32 %tmp3, i32* %useri
+%user_i = alloca i32
+store i32 %tmp3, i32* %user_i
 %tmp4 = call float @readf()
-%userf = alloca float
-store float %tmp4, float* %userf
-%tmp5 = load i32, i32* %useri
+%user_f = alloca float
+store float %tmp4, float* %user_f
+%tmp5 = load i32, i32* %user_i
 call void @writei(i32 %tmp5)
-%tmp6 = load float, float* %userf
+%tmp6 = load float, float* %user_f
 call void @writef(float %tmp6)
 ret i32 0
 }

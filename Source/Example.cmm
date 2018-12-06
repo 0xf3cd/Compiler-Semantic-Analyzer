@@ -5,11 +5,11 @@ int main() {
     writei(b);
     writef(itof(c));
 
-    int useri = readi();
-    float userf = readf();
+    int user_i = readi();
+    float user_f = readf();
 
-    writei(useri);
-    writef(userf);
+    writei(user_i);
+    writef(user_f);
 
     return 0;
 }
