@@ -144,7 +144,13 @@ const LA = new LabelAllocator();
  * @return {Node}
  */
 const f1 = function(right, VST, FST) {
-	// S' -> S $ 1
+    // S' -> S $ 1
+    const S_ = new Node();
+    const S = deepCopy(right[0]);
+
+    S_.IR = S.IR;
+
+    return S_;
 };
 
 /**
@@ -155,7 +161,13 @@ const f1 = function(right, VST, FST) {
  * @return {Node}
  */
 const f2 = function(right, VST, FST) {
-	// S -> <Body> $ 2
+    // S -> <Body> $ 2
+    const S = new Node();
+    const B = deepCopy(right[0]);
+
+    S.IR = B.IR;
+
+    return S;
 };
 
 /**
@@ -166,7 +178,15 @@ const f2 = function(right, VST, FST) {
  * @return {Node}
  */
 const f3 = function(right, VST, FST) {
-	// S -> <Body> S $ 3
+    // S -> <Body> S $ 3
+    const S1 = new Node();
+    const B = deepCopy(right[0]);
+    const S2 = deepCopy(right[1]);
+
+    S1.IR += B.IR;
+    S1.IR += S2.IR;
+
+    return S1;
 };
 
 /**
@@ -177,7 +197,13 @@ const f3 = function(right, VST, FST) {
  * @return {Node}
  */
 const f4 = function(right, VST, FST) {
-	// <Body> -> <Decl> $ 4
+    // <Body> -> <Decl> $ 4
+    const B = new Node();
+    const D = deepCopy(right[0]);
+
+    B.IR = D.IR;
+
+    return B;
 };
 
 /**
@@ -188,7 +214,13 @@ const f4 = function(right, VST, FST) {
  * @return {Node}
  */
 const f5 = function(right, VST, FST) {
-	// <Decl> -> <VarDecl> $ 5
+    // <Decl> -> <VarDecl> $ 5
+    const D = new Node();
+    const VD = deepCopy(right[0]);
+
+    D.IR = VD.IR;
+
+    return D;
 };
 
 /**
@@ -199,7 +231,13 @@ const f5 = function(right, VST, FST) {
  * @return {Node}
  */
 const f6 = function(right, VST, FST) {
-	// <Decl> -> <FuncDecl> $ 6
+    // <Decl> -> <FuncDecl> $ 6
+    const D = new Node();
+    const FD = deepCopy(right[0]);
+
+    D.IR = FD.IR;
+
+    return D;
 };
 
 /**
@@ -210,7 +248,21 @@ const f6 = function(right, VST, FST) {
  * @return {Node}
  */
 const f7 = function(right, VST, FST) {
-	// <VarDecl> -> int ID ; $ 7
+    // <VarDecl> -> int ID ; $ 7
+    const VD = new Node();
+    const ID = deepCopy(right[1]);
+
+    VST.append(ID.val, 'int');
+
+    const newTemp1 = TA.getNewTemp(); // 指针
+    const varType = 'i32';
+    const storeVal = '0';
+
+    VD.IR += `%${newTemp1} = alloca ${varType}\n`;
+    VD.IR += `store ${varType} ${storeVal}, ${varType}* ${newTemp1}\n`;
+    VD.IR += `%${ID.val} = load ${varType}, ${varType}* ${newTemp1}\n`;  // 此时 ID.val 中储存着带返回值
+
+    return VD;
 };
 
 /**
@@ -221,7 +273,33 @@ const f7 = function(right, VST, FST) {
  * @return {Node}
  */
 const f8 = function(right, VST, FST) {
-	// <VarDecl> -> int ID = <Exprsn> ; $ 8
+    // <VarDecl> -> int ID = <Exprsn> ; $ 8
+    const VD = new Node();
+    const ID = deepCopy(right[1]);
+    const E = deepCopy(right[3]);
+
+    if(E.valType !== 'int') {
+        const errorInfo = 'Assign a value of float to a var of int';
+        throw new Error(errorInfo);
+    }
+
+    VST.append(ID.val, 'int');
+
+    const newTemp1 = TA.getNewTemp(); // 指针
+    const varType = 'i32';
+    let storeVal;
+    if(hasLetter(E.val)) {
+        storeVal = '%' + E.val;
+    } else {
+        storeVal = E.val;
+    }
+
+    VD.IR += E.IR;
+    VD.IR += `%${newTemp1} = alloca ${varType}\n`;
+    VD.IR += `store ${varType} ${storeVal}, ${varType}* ${newTemp1}\n`;
+    VD.IR += `%${ID.val} = load ${varType}, ${varType}* ${newTemp1}\n`;  // 此时 ID.val 中储存着带返回值
+
+    return VD;
 };
 
 /**
@@ -232,7 +310,21 @@ const f8 = function(right, VST, FST) {
  * @return {Node}
  */
 const f9 = function(right, VST, FST) {
-	// <VarDecl> -> float ID ; $ 9
+    // <VarDecl> -> float ID ; $ 9
+    const VD = new Node();
+    const ID = deepCopy(right[1]);
+
+    VST.append(ID.val, 'float');
+
+    const newTemp1 = TA.getNewTemp(); // 指针
+    const varType = 'float';
+    const storeVal = representFloat('0.0');
+
+    VD.IR += `%${newTemp1} = alloca ${varType}\n`;
+    VD.IR += `store ${varType} ${storeVal}, ${varType}* ${newTemp1}\n`;
+    VD.IR += `%${ID.val} = load ${varType}, ${varType}* ${newTemp1}\n`;  // 此时 ID.val 中储存着带返回值
+
+    return VD;
 };
 
 /**
@@ -243,7 +335,33 @@ const f9 = function(right, VST, FST) {
  * @return {Node}
  */
 const f10 = function(right, VST, FST) {
-	// <VarDecl> -> float ID = <Exprsn> ; $ 10
+    // <VarDecl> -> float ID = <Exprsn> ; $ 10
+    const VD = new Node();
+    const ID = deepCopy(right[1]);
+    const E = deepCopy(right[3]);
+
+    if(E.valType !== 'float') {
+        const errorInfo = 'Assign a value of int to a var of float';
+        throw new Error(errorInfo);
+    }
+
+    VST.append(ID.val, 'float');
+
+    const newTemp1 = TA.getNewTemp(); // 指针
+    const varType = 'float';
+    let storeVal;
+    if(hasLetter(E.val)) {
+        storeVal = '%' + E.val;
+    } else {
+        storeVal = representFloat(E.val);
+    }
+
+    VD.IR += E.IR;
+    VD.IR += `%${newTemp1} = alloca ${varType}\n`;
+    VD.IR += `store ${varType} ${storeVal}, ${varType}* ${newTemp1}\n`;
+    VD.IR += `%${ID.val} = load ${varType}, ${varType}* ${newTemp1}\n`;  // 此时 ID.val 中储存着带返回值
+
+    return VD;
 };
 
 /**
@@ -254,7 +372,18 @@ const f10 = function(right, VST, FST) {
  * @return {Node}
  */
 const f11 = function(right, VST, FST) {
-	// <FuncDecl> -> int ID  ( <FormalParams> ) <StmtBlock> $ 11
+    // <FuncDecl> -> int ID  ( <FormalParams> ) <StmtBlock> $ 11
+    if(SB.returnType !== 'int') {
+        const errorInfo = 'Return type differs from function declaration';
+        throw new Error(errorInfo);
+    }
+
+    FD.IR += `define int @${ID.val}(${FP.IR}) {\n`;
+    FD.IR += SB.IR;
+    FD.IR += `}\n`;
+    FST.append(ID.val, 'int', FP.paramType, FP.paramName);
+
+    return FD;
 };
 
 /**
@@ -265,7 +394,22 @@ const f11 = function(right, VST, FST) {
  * @return {Node}
  */
 const f12 = function(right, VST, FST) {
-	// <FuncDecl> -> float ID  ( <FormalParams> ) <StmtBlock> $ 12
+    // <FuncDecl> -> float ID  ( <FormalParams> ) <StmtBlock> $ 12
+    const FD = new Node();
+    const ID = deepCopy(right[1]);
+    const FP = deepCopy(right[3]);
+    const SB = deepCopy(right[5]);
+
+    if(SB.returnType !== 'float') {
+        const errorInfo = 'Return type differs from function declaration';
+        throw new Error(errorInfo);
+    }
+    FD.IR += `define float @${ID.val}(${FP.IR}) {\n`;
+    FD.IR += SB.IR;
+    FD.IR += `}\n`;
+    FST.append(ID.val, 'float', FP.paramType, FP.paramName);
+
+    return FD;
 };
 
 /**
@@ -276,7 +420,22 @@ const f12 = function(right, VST, FST) {
  * @return {Node}
  */
 const f13 = function(right, VST, FST) {
-	// <FuncDecl> -> void ID  ( <FormalParams> ) <StmtBlock> $ 13
+    // <FuncDecl> -> void ID  ( <FormalParams> ) <StmtBlock> $ 13
+    const FD = new Node();
+    const ID = deepCopy(right[1]);
+    const FP = deepCopy(right[3]);
+    const SB = deepCopy(right[5]);
+
+    if(SB.returnType !== 'void') {
+        const errorInfo = 'Return type differs from function declaration';
+        throw new Error(errorInfo);
+    }
+    FD.IR += `define void @${ID.val}(${FP.IR}) {\n`;
+    FD.IR += SB.IR;
+    FD.IR += `}\n`;
+    FST.append(ID.val, 'void', FP.paramType, FP.paramName);
+
+    return FD;
 };
 
 /**
@@ -287,7 +446,15 @@ const f13 = function(right, VST, FST) {
  * @return {Node}
  */
 const f14 = function(right, VST, FST) {
-	// <FormalParams> -> <ParamList> $ 14
+    // <FormalParams> -> <ParamList> $ 14
+    const FP = new Node();
+    const P = deepCopy(right[0]);
+
+    FP.paramName = P.paramName;
+    FP.paramType = P.paramType;
+    FP.IR = P.IR;
+
+    return FP;
 };
 
 /**
@@ -298,7 +465,9 @@ const f14 = function(right, VST, FST) {
  * @return {Node}
  */
 const f15 = function(right, VST, FST) {
-	// <FormalParams> -> void $ 15
+    // <FormalParams> -> void $ 15
+    const FP = new Node();
+    return FP;
 };
 
 /**
@@ -309,7 +478,9 @@ const f15 = function(right, VST, FST) {
  * @return {Node}
  */
 const f16 = function(right, VST, FST) {
-	// <FormalParams> -> ε $ 16
+    // <FormalParams> -> ε $ 16
+    const FP = new Node();
+    return FP;
 };
 
 /**
@@ -320,7 +491,15 @@ const f16 = function(right, VST, FST) {
  * @return {Node}
  */
 const f17 = function(right, VST, FST) {
-	// <ParamList> -> <Param> $ 17
+    // <ParamList> -> <Param> $ 17
+    const PL = new Node();
+    const P = deepCopy(right[0]);
+
+    PL.paramName.unshift(P.paramName[0]);
+    PL.paramType.unshift(P.paramType[0]);
+    PL.IR = P.IR;
+
+    return PL;
 };
 
 /**
@@ -331,7 +510,19 @@ const f17 = function(right, VST, FST) {
  * @return {Node}
  */
 const f18 = function(right, VST, FST) {
-	// <ParamList> -> <Param> , <ParamList> $ 18
+    // <ParamList> -> <Param> , <ParamList> $ 18
+    const PL1 = new Node();
+    const P = deepCopy(right[0]);
+    const PL2 = deepCopy(right[2]);
+
+    PL1.paramType = PL2.paramType;
+    PL1.paramName = PL2.paramName;
+    PL1.paramType.unshift(P.paramType[0]);
+    PL1.paramName.unshift(P.paramName[0]);
+
+    PL1.IR = P.IR + ', ' + PL2.IR;
+
+    return PL1;
 };
 
 /**
@@ -342,7 +533,15 @@ const f18 = function(right, VST, FST) {
  * @return {Node}
  */
 const f19 = function(right, VST, FST) {
-	// <Param> -> int ID $ 19
+    // <Param> -> int ID $ 19
+    const P = new Node();
+    const ID = deepCopy(right[1]);
+
+    P.paramType.unshift('int');
+    P.paramName.unshift(ID.val);
+    P.IR = `i32 %${ID}`;
+
+    return P;
 };
 
 /**
@@ -353,7 +552,15 @@ const f19 = function(right, VST, FST) {
  * @return {Node}
  */
 const f20 = function(right, VST, FST) {
-	// <Param> -> float ID $ 20
+    // <Param> -> float ID $ 20
+    const P = new Node();
+    const ID = deepCopy(right[1]);
+
+    P.paramType = 'float';
+    P.paramName = ID.val;
+    P.IR = `float %${ID}`;
+
+    return P;
 };
 
 /**
@@ -620,8 +827,8 @@ const f32 = function(right, VST, FST) {
     const newLabel2 = LA.getNewLabel();
     const newLabel3 = LA.getNewLabel();
 
-    WS.IR += `${newLabel1}:\n`;
     WS.IR += E.IR;
+    WS.IR += `${newLabel1}:\n`; 
     WS.IR += `%${newTemp1} = icmp eq i32 ${hasLetter(E.val)? ('%' + E.val): E.val}, 1\n`;
     WS.IR += `br i1 %${newTemp1}, label %${newLabel2}, label %${newLabel3}\n`;
     WS.IR += `${newLabel2}:\n`;
