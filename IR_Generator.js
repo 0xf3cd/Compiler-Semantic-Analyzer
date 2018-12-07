@@ -1667,12 +1667,14 @@ IR_Generator.prototype._initialize = function() {
     // console.log(this._IR_Head);
 
     // 向符号表和函数表中预先存入库函数和需要的全局变量
-    this._varTable.append('inputf', 'float');
-    this._varTable.append('inputi', 'int');
+    // this._varTable.append('inputf', 'float');
+    // this._varTable.append('inputi', 'int');
     this._funcTable.append('readf', 'float', [], []);
     this._funcTable.append('writef', 'void', ['float'], ['itDoesntMatter']);
     this._funcTable.append('readi', 'int', [], []);
     this._funcTable.append('writei', 'void', ['int'], ['itDoesntMatter']);
+    this._funcTable.append('readc', 'int', [], []);
+    this._funcTable.append('writec', 'void', ['int'], ['itDoesntMatter']);
     this._funcTable.append('itof', 'float', ['int'], ['itDoesntMatter']);
     this._funcTable.append('ftoi', 'int', ['float'], ['itDoesntMatter']);
 };

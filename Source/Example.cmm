@@ -13,18 +13,49 @@ int calcSum(int s, int e) {
     return sum;
 }
 
+int getStart() {
+    writec(83); //S
+    writec(116); //t
+    writec(97); //a
+    writec(114); //r
+    writec(116); //t
+    writec(58); //:
+    writec(32); //space
+    return readi();
+}
+
+int getEnd() {
+    writec(69); //E
+    writec(110); //n
+    writec(100); //d
+    writec(58); //:
+    writec(32); //space
+    return readi();
+}
+
+void printTheSum(int result) {
+    writec(10);
+    writec(65); //A
+    writec(110); //n
+    writec(115); //s
+    writec(119); //w
+    writec(101); //e
+    writec(114); //r
+    writec(58); //:
+    writec(32); //space
+    writei(result);
+    writec(10);
+}
+
 int main() {
-    writei(b);
-    writef(itof(c));
+    // writei(b);
+    // writef(itof(c));
 
-    //int user_i = readi();
-    //float user_f = readf();
-    //int x = -3;
+    int user_s = getStart();
+    int user_e = getEnd();
 
-    //writei(user_i + x);
-    //writef(user_f);
-
-    writei(calcSum(0, 100));
+    int result = calcSum(user_s, user_e);
+    printTheSum(result);
 
     return 0;
 }

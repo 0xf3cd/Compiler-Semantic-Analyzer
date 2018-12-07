@@ -9,7 +9,7 @@ P.setSource('./Source/Example.cmm');
 P.initialize();
 
 I.setProdNoFilePath('./Grammar/Production-No.txt');
-I.setIRPath('./IR/IR.ll');
+I.setIRPath('./IR.ll');
 I.readProdNoFile();
 
 while(true) {

@@ -1,24 +1,35 @@
 #include <stdio.h>
 
-float inputf;
-int inputi;
-
 float readf() {
-	scanf("%f", &inputf);
-	return inputf;
+	float f;
+	scanf("%f", &f);
+	return f;
 }
 
 void writef(float f) {
-	printf("%f\n", f);
+	printf("%f", f);
 }
 
 int readi() {
-	scanf("%d", &inputi);
-	return inputi;
+	int i;
+	scanf("%d", &i);
+	return i;
 }
 
 void writei(int i) {
-	printf("%d\n", i);
+	printf("%d", i);
+}
+
+/* 返回所读入的字符的 ascii 码 */
+int readc() {
+	char c;
+	scanf("%c", &c);
+	return (int)(c);
+}
+
+/* 输出 ascii 码对应的字符 */
+void writec(int i) {
+	printf("%c", (char)(i));
 }
 
 int ftoi(int f) {
